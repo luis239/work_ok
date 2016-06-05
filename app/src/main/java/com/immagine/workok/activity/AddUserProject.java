@@ -1,15 +1,21 @@
 package com.immagine.workok.activity;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerViewAccessibilityDelegate;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.immagine.workok.R;
@@ -22,7 +28,7 @@ import java.util.List;
 
 import static com.immagine.workok.R.id.reciclador;
 
-public class AddUserProject extends AppCompatActivity {
+public class AddUserProject extends AppCompatActivity implements UserProjectAdapter.OnItemClickListener {
 
     private RecyclerView recycler;
     private RecyclerView.Adapter adapter;
@@ -30,6 +36,7 @@ public class AddUserProject extends AppCompatActivity {
     private Button addButton;
     private AlertDialog.Builder alertDialog;
     private AlertDialog dialog;
+    private List<Project> items = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +54,6 @@ public class AddUserProject extends AppCompatActivity {
                 dialogAddUser();
             }
         });
-        List<Project> items = new ArrayList<>();
 
         items.add(new Project("Persona 1", "Angel Beats", 20));
         items.add(new Project("Persona 2", "Death Note", 30));
@@ -63,42 +69,32 @@ public class AddUserProject extends AppCompatActivity {
         recycler.setLayoutManager(lManager);
 
         // Crear un nuevo adaptador
-        adapter = new UserProjectAdapter(items);
+        adapter = new UserProjectAdapter(items,this);
         recycler.setAdapter(adapter);
     }
 
     private void dialogAddUser() {
-        List<Project> items = new ArrayList<>();
-
-        items.add(new Project("Persona 1", "Angel Beats", 20));
-        items.add(new Project("Persona 2", "Death Note", 30));
-        items.add(new Project("Persona 3", "Fate Stay Night", 100));
-        items.add(new Project("Persona 4", "Welcome to the NHK", 80));
-        items.add(new Project("Persona 5", "Suzumiya Haruhi", 35));
-
-        alertDialog = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View convertView = inflater.inflate(R.layout.dialog_user_selector, null);
-        alertDialog.setView(convertView);
-
-
-
-
-        recycler = (RecyclerView) findViewById(R.id.listView);
-        lManager = new LinearLayoutManager(this);
-        recycler.setLayoutManager(lManager);
-        recycler.setHasFixedSize(true);
-
-        adapter = new UserProjectAdapter(items);
-        recycler.setAdapter(adapter);
-        alertDialog.setCancelable(true);
-        dialog = alertDialog.create();
-        dialog = alertDialog.show();
-        dialog.setCanceledOnTouchOutside(true);
-
-
+        UserSelectionDialog cd = new UserSelectionDialog(this);
+        cd.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        cd.show();
 
     }
+
+
+    public void removeItem(View v){
+
+        int selectedItemPos = recycler.getChildAdapterPosition(v);
+        RecyclerView.ViewHolder viewHolder = recycler.findViewHolderForAdapterPosition(selectedItemPos);
+        /*for (int i = 0; i < items.size(); i++){
+
+
+
+        }*/
+
+        items.remove(selectedItemPos);
+        adapter.notifyItemRemoved(selectedItemPos);
+    }
+
 
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -112,4 +108,30 @@ public class AddUserProject extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onClick(UserProjectAdapter.UserProjectViewHolder holder, final int idPromocion) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+// Add the buttons
+        builder.setMessage("Desea eliminar este usuario?");
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                items.remove(idPromocion);
+                adapter.notifyItemRemoved(idPromocion);
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+
+        AlertDialog dialog = builder.show();
+        dialog.setCanceledOnTouchOutside(true);
+
+
+
+
+
+    }
 }

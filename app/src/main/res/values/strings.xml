@@ -36,4 +36,10 @@
     <string name="date_end">Fecha de Fin</string>
     <string name="create_project">Crear Proyecto</string>
     <string name="add_user">Agregar Persona</string>
+    <string name="select_add_user">Seleccione las Personas a Agregar</string>
+    <string name="add_user_title">Seleccione los usuarios que desea agregar al proyecto</string>
+    <string name="add">Agregar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="ok">Aceptar</string>
+
 </resources>

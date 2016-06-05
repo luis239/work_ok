@@ -26,14 +26,14 @@
             android:layout_height="1dp"
             android:background="#ffd5d5d5"
             android:id="@+id/linea"
-            android:layout_above="@+id/compartir">
+            android:layout_above="@+id/imageButton">
 
         </View>
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/compartir"
+            android:id="@+id/imageButton"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:src="@android:drawable/ic_menu_delete"
