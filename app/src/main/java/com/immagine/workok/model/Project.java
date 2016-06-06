@@ -13,6 +13,7 @@ public class Project {
     private int percentage;
     private int status_id;
     private int project_id;
+    private boolean selected;
 
     public Project(String title, String description, int percentage) {
         this.title = title;
@@ -76,4 +77,7 @@ public class Project {
         this.project_id = project_id;
     }
 
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
 }

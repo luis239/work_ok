@@ -4,11 +4,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.immagine.workok.R;
 import com.immagine.workok.model.Project;
+import com.immagine.workok.model.User;
 
 import java.util.List;
 
@@ -18,7 +21,7 @@ import java.util.List;
 public class UserProjectAdapter extends RecyclerView.Adapter<UserProjectAdapter.UserProjectViewHolder>{
 
 
-    private List<Project> items;
+    private List<User> items;
     private boolean isAdd = false;
 
 
@@ -32,12 +35,15 @@ public class UserProjectAdapter extends RecyclerView.Adapter<UserProjectAdapter.
         // Campos respectivos de un item
         public ImageView imagen;
         public TextView nombre;
+        public CheckBox checkBox;
 
         public UserProjectViewHolder(View v) {
             super(v);
             imagen = (ImageView) v.findViewById(R.id.imageButton);
             nombre = (TextView) v.findViewById(R.id.nombre);
+            checkBox = (CheckBox) v.findViewById(R.id.checkBox);
             imagen.setOnClickListener(this);
+            checkBox.setOnClickListener(this);
         }
 
         @Override
@@ -46,22 +52,23 @@ public class UserProjectAdapter extends RecyclerView.Adapter<UserProjectAdapter.
         }
     }
 
-    public UserProjectAdapter(List<Project> items) {
+    public UserProjectAdapter(List<User> items) {
 
         this.items = items;
     }
 
-    public UserProjectAdapter(List<Project> items, OnItemClickListener listener) {
+    public UserProjectAdapter(List<User> items, OnItemClickListener listener) {
 
         this.listener = listener;
         this.items = items;
     }
 
 
-    public UserProjectAdapter(List<Project> items, boolean isAdd) {
+    public UserProjectAdapter(List<User> items, boolean isAdd, OnItemClickListener listener) {
 
         this.items = items;
         this.isAdd = isAdd;
+        this.listener = listener;
     }
 
     @Override
@@ -72,13 +79,27 @@ public class UserProjectAdapter extends RecyclerView.Adapter<UserProjectAdapter.
     }
 
     @Override
-    public void onBindViewHolder(UserProjectViewHolder holder, int position) {
+    public void onBindViewHolder(final UserProjectViewHolder holder, final int position) {
 
-        if(isAdd)
-            holder.imagen.setImageResource(R.drawable.ic_checkmark_48);
+        if(isAdd) {
+            holder.imagen.setVisibility(View.INVISIBLE);
+            holder.checkBox.setOnCheckedChangeListener(null);
+            if(items.get(position).isSelected()){
 
-        holder.nombre.setText(items.get(position).getTitle());
-        //holder.visitas.setText("Completado: "+String.valueOf(items.get(position).getPercentage())+"%");
+                holder.checkBox.setChecked(true);
+            }else{
+
+                holder.checkBox.setChecked(false);
+            }
+
+
+        }else{
+
+            holder.checkBox.setVisibility(View.INVISIBLE);
+        }
+
+        holder.nombre.setText(items.get(position).getUsername());
+
     }
 
 

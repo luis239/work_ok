@@ -4,29 +4,20 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerViewAccessibilityDelegate;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.immagine.workok.R;
-import com.immagine.workok.adapter.ProjectAdapter;
 import com.immagine.workok.adapter.UserProjectAdapter;
-import com.immagine.workok.model.Project;
+import com.immagine.workok.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.immagine.workok.R.id.reciclador;
 
 public class AddUserProject extends AppCompatActivity implements UserProjectAdapter.OnItemClickListener {
 
@@ -36,7 +27,7 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
     private Button addButton;
     private AlertDialog.Builder alertDialog;
     private AlertDialog dialog;
-    private List<Project> items = new ArrayList<>();
+    private List<User> items = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,11 +46,11 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
             }
         });
 
-        items.add(new Project("Persona 1", "Angel Beats", 20));
-        items.add(new Project("Persona 2", "Death Note", 30));
-        items.add(new Project("Persona 3", "Fate Stay Night", 100));
-        items.add(new Project("Persona 4", "Welcome to the NHK", 80));
-        items.add(new Project("Persona 5", "Suzumiya Haruhi", 35));
+        items.add(new User("Persona 1", 2));
+        items.add(new User("Persona 2", 3));
+        items.add(new User("Persona 3", 1));
+        items.add(new User("Persona 4", 8));
+        items.add(new User("Persona 5", 5));
 
         recycler = (RecyclerView) findViewById(R.id.listView);
         //recycler.setHasFixedSize(true);
