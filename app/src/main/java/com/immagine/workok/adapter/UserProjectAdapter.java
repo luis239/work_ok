@@ -103,7 +103,6 @@ public class UserProjectAdapter extends RecyclerView.Adapter<UserProjectAdapter.
     }
 
 
-
     @Override
     public int getItemCount() {
         return items.size();

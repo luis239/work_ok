@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Created by Alejandro on 04/06/2016.
  */
-public class UserSelectionDialog extends Dialog implements UserProjectAdapter.OnItemClickListener{
+public class UserSelectionDialog extends Dialog implements UserProjectAdapter.OnItemClickListener,View.OnClickListener{
 
 
     private Activity act;
@@ -31,9 +31,13 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
     private Button add;
     private ImageView imageButton;
     private List<User> items = new ArrayList<>();
-    public UserSelectionDialog(Activity a) {
+    private OnClickAddUser listener;
+    private List<User>userSelected = new ArrayList<>();
+
+    public UserSelectionDialog(Activity a,OnClickAddUser listener) {
         super(a);
         this.act = a;
+        this.listener = listener;
     }
 
     @Override
@@ -44,17 +48,19 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
         this.setTitle(R.string.select_add_user);
 
 
-        items.add(new User("Persona 1", 2));
-        items.add(new User("Persona 2", 3));
-        items.add(new User("Persona 3", 1));
-        items.add(new User("Persona 4", 8));
-        items.add(new User("Persona 5", 5));
-        items.add(new User("Persona 6", 10));
-        items.add(new User("Persona 7", 35));
-        items.add(new User("Persona 8", 80));
-        items.add(new User("Persona 9", 6));
+        items.add(new User("Luis Fagundez", 2));
+        items.add(new User("Jumi", 3));
+        items.add(new User("Ricardo", 1));
+        items.add(new User("Jose", 8));
+        items.add(new User("Kira", 5));
+        items.add(new User("Naruto", 10));
+        items.add(new User("Danerys", 35));
+        items.add(new User("Jon Snow", 80));
+        items.add(new User("Rick Grimes", 6));
 
         recycler = (RecyclerView) findViewById(R.id.recycler_view);
+        add = (Button) findViewById(R.id.button2);
+        add.setOnClickListener(this);
         //recycler.setHasFixedSize(true);
 
         // Usar un administrador para LinearLayout
@@ -71,5 +77,27 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
 
         items.get(idPromocion).setSelected(true);
 
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        switch(v.getId()){
+
+            case (R.id.button2):{
+
+                for (User u:items) {
+                    if (u.isSelected())
+                        userSelected.add(u);
+                }
+            }
+        }
+        listener.onClickAdd(userSelected);
+        this.cancel();
+    }
+
+    public interface OnClickAddUser{
+
+        void onClickAdd(List<User> items);
     }
 }

@@ -41,5 +41,14 @@
     <string name="add">Agregar</string>
     <string name="cancel">Cancelar</string>
     <string name="ok">Aceptar</string>
+    <string name="task_name">Nombre de Tarea</string>
+    <string name="notes">Observaciones</string>
+    <string name="user_assigned">Usuario Asignado</string>
+    <string name="in_progress">En Progreso</string>
+    <string name="rejected">Rechazada</string>
+    <string name="done">Realizada</string>
+    <string name="status">Estado</string>
+    <string name="update_status">Cambiar Estado</string>
+    <string name="percentage_progress">Porcentaje de Avance</string>
 
 </resources>

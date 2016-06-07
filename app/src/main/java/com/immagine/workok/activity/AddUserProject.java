@@ -1,5 +1,6 @@
 package com.immagine.workok.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -19,7 +20,7 @@ import com.immagine.workok.model.User;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddUserProject extends AppCompatActivity implements UserProjectAdapter.OnItemClickListener {
+public class AddUserProject extends AppCompatActivity implements UserProjectAdapter.OnItemClickListener,UserSelectionDialog.OnClickAddUser {
 
     private RecyclerView recycler;
     private RecyclerView.Adapter adapter;
@@ -65,27 +66,11 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
     }
 
     private void dialogAddUser() {
-        UserSelectionDialog cd = new UserSelectionDialog(this);
+        UserSelectionDialog cd = new UserSelectionDialog(this,this);
         cd.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         cd.show();
 
     }
-
-
-    public void removeItem(View v){
-
-        int selectedItemPos = recycler.getChildAdapterPosition(v);
-        RecyclerView.ViewHolder viewHolder = recycler.findViewHolderForAdapterPosition(selectedItemPos);
-        /*for (int i = 0; i < items.size(); i++){
-
-
-
-        }*/
-
-        items.remove(selectedItemPos);
-        adapter.notifyItemRemoved(selectedItemPos);
-    }
-
 
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -120,9 +105,13 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
         AlertDialog dialog = builder.show();
         dialog.setCanceledOnTouchOutside(true);
 
+    }
 
+    @Override
+    public void onClickAdd(List<User> itemsSelected) {
 
-
-
+        int pos = items.size();
+        items.addAll(itemsSelected);
+        adapter.notifyItemInserted(pos);
     }
 }
