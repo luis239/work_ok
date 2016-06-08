@@ -33,8 +33,12 @@
         <activity
             android:name=".activity.NewProjectActivity"
             android:label="@string/title_activity_new_project" />
-        <activity android:name=".activity.NewTaskActivity" />
-        <activity android:name=".activity.AddUserProject"></activity>
+        <activity android:name=".activity.NewTaskActivity"
+            android:label="@string/title_new_task"/>
+        <activity android:name=".activity.AddUserProject"
+            android:label="@string/title_add_user"/>
+        <activity android:name=".activity.ProyectDetailsActivity"
+            android:label="@string/title_project_details"></activity>
     </application>
 
 </manifest>

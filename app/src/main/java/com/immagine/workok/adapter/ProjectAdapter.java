@@ -19,7 +19,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
 
 
     private List<Project> items;
-
+    private boolean isDetail = false;
 
     public static class ProjectViewHolder extends RecyclerView.ViewHolder {
         // Campos respectivos de un item
@@ -51,8 +51,13 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
     public void onBindViewHolder(ProjectViewHolder holder, int position) {
 
         //holder.imagen.setImageResource(items.get(i).getImagen());
+
         holder.nombre.setText(items.get(position).getTitle());
-        holder.visitas.setText("Completado: "+String.valueOf(items.get(position).getPercentage())+"%");
+        if (isDetail){
+            holder.visitas.setText("Completado: "+String.valueOf(items.get(position).getPercentage())+"%");
+        }else {
+            holder.visitas.setText("Completado: " + String.valueOf(items.get(position).getPercentage()) + "%");
+        }
     }
 
     @Override

@@ -18,94 +18,124 @@
         android:src="@drawable/logo"
         android:layout_gravity="center" />
 
-    <LinearLayout
-        android:orientation="vertical"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="1">
+        android:id="@+id/scrollView" >
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/projectName"
-            android:layout_marginTop="5dp"
-            android:inputType="text"
-            android:hint="@string/task_name" />
-
-        <EditText
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/editText2"
-            android:layout_marginTop="5dp"
-            android:inputType="text"
-            android:hint="@string/user_assigned"
-            android:layout_gravity="center_horizontal" />
+            android:weightSum="1">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/status"
-            android:id="@+id/textView2"
-            android:layout_gravity="center_horizontal" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/projectName"
+                android:layout_marginTop="5dp"
+                android:inputType="text"
+                android:hint="@string/task_name" />
 
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/in_progress"
-            android:id="@+id/radioButton"
-            android:layout_gravity="center_horizontal" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText2"
+                android:layout_marginTop="5dp"
+                android:inputType="text"
+                android:hint="@string/user_assigned"
+                android:layout_gravity="center_horizontal" />
 
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/rejected"
-            android:id="@+id/radioButton2"
-            android:layout_gravity="center_horizontal"
-            android:paddingRight="7dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/status"
+                android:id="@+id/textView2"
+                android:layout_gravity="center_horizontal" />
 
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/done"
-            android:id="@+id/radioButton3"
-            android:layout_gravity="center_horizontal"
-            android:paddingRight="16dp" />
+            <RadioGroup
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal">
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/editText3"
-            android:layout_gravity="center_horizontal" />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/in_progress"
+                    android:id="@+id/radioButton"
+                    android:layout_gravity="center_horizontal" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/percentage_progress"
-            android:id="@+id/textView3"
-            android:textSize="16sp" />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rejected"
+                    android:id="@+id/radioButton2"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingRight="7dp" />
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:ems="10"
-            android:id="@+id/editText4"
-            android:lines="3"
-            android:hint="@string/notes" />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/done"
+                    android:id="@+id/radioButton3"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingRight="16dp" />
+            </RadioGroup>
 
-    </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right">
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/update_status"
-        android:id="@+id/button"
-        android:layout_gravity="center_horizontal"
-        android:background="#000000"
-        android:textColor="#ffffff" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/percentage_progress"
+                    android:id="@+id/textView3"
+                    android:textSize="16sp"
+                    android:layout_marginRight="20dp" />
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/editText5"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:inputType="number" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="%"
+                    android:id="@+id/textView4"
+                    android:layout_marginLeft="10dp"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="20dp"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:ems="10"
+                android:id="@+id/editText4"
+                android:lines="3"
+                android:hint="@string/notes" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/update_status"
+                android:id="@+id/button"
+                android:layout_gravity="center_horizontal"
+                android:background="#000000"
+                android:textColor="#ffffff" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.immagine.workok.R;
 import com.immagine.workok.adapter.ProjectAdapter;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView recycler;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager lManager;
+    private TextView message;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,10 +69,13 @@ public class MainActivity extends AppCompatActivity
 
         items.add(new Project("Project 1", "Angel Beats", 20));
         items.add(new Project("Project 2", "Death Note", 30));
-        items.add(new Project("Project 3", "Fate Stay Night", 100));
-        items.add(new Project("Project 4", "Welcome to the NHK", 80));
-        items.add(new Project("Project 5", "Suzumiya Haruhi", 35));
+//        items.add(new Project("Project 3", "Fate Stay Night", 100));
+//        items.add(new Project("Project 4", "Welcome to the NHK", 80));
+//        items.add(new Project("Project 5", "Suzumiya Haruhi", 35));
 
+        message = (TextView)findViewById(R.id.message);
+        if (!items.isEmpty())
+            message.setVisibility(View.GONE);
         recycler = (RecyclerView) findViewById(reciclador);
         //recycler.setHasFixedSize(true);
 
@@ -129,6 +134,9 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
 
         } else if (id == R.id.nav_gallery) {
+
+            Intent intent = new Intent(MainActivity.this,ProyectDetailsActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_slideshow) {
 

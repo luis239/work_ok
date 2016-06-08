@@ -52,6 +52,8 @@ public class UserProjectAdapter extends RecyclerView.Adapter<UserProjectAdapter.
         }
     }
 
+
+
     public UserProjectAdapter(List<User> items) {
 
         this.items = items;

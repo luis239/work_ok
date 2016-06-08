@@ -24,7 +24,9 @@
     <string name="title_activity_test">test</string>
     <string name="title_activity_sign_in">Registro</string>
     <string name="title_activity_main">Mis Proyectos</string>
-    <string name="title_activity_new_project">Nuevo Proyecto</string>
+    <string name="title_new_task">Nueva Tarea</string>
+    <string name="title_add_user">Agregar Usuario</string>
+    <string name="title_project_details">Detalle de Proyecto</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -50,5 +52,8 @@
     <string name="status">Estado</string>
     <string name="update_status">Cambiar Estado</string>
     <string name="percentage_progress">Porcentaje de Avance</string>
+    <string name="message_new_project">Presione el símbolo de + para crear un nuevo proyecto</string>
+    <string name="title_activity_new_project">Nuevo Proyecto</string>
+    <string name="exit">Salir</string>
 
 </resources>
