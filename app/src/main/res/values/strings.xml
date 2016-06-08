@@ -6,10 +6,13 @@
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Ingresar</string>
     <string name="action_sign_in_short">Ingresar</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password or email is incorrect</string>
-    <string name="error_field_required">This field is required</string>
+    <string name="error_invalid_email">Email no Válido</string>
+    <string name="error_invalid_password">Contraseña muy COrta</string>
+    <string name="error_incorrect_password">Contraseña o nombre de usuario inválido</string>
+    <string name="error_field_required">Campo Requerido</string>
+    <string name="error_password_not_match">La Contraseña no coincide</string>
+    <string name="error_username_short">Nombre de Usuario muy corto</string>
+    <string name="error_accept_tos">Debe Aceptar los Términos y Condiciones</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>

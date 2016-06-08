@@ -350,21 +350,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
 
-//
 
             String dataUrl = "http://www.jexsantofagasta.cl/workok/wouser.php";
-            String dataUrlParameters = "username="+mUser+"&password="+mPassword+"&action=5";
+            String dataUrlParameters = "username="+mUser+"&password="+mPassword+"&action=6";
             URL url;
             HttpURLConnection connection = null;
             try {
-// Create connection
+                // Create connection
                 url = new URL(dataUrl);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
@@ -374,13 +367,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 connection.setUseCaches(false);
                 connection.setDoInput(true);
                 connection.setDoOutput(true);
-// Send request
+                // Send request
                 DataOutputStream wr = new DataOutputStream(
                         connection.getOutputStream());
                 wr.writeBytes(dataUrlParameters);
                 wr.flush();
                 wr.close();
-// Get Response
+                // Get Response
                 InputStream is = connection.getInputStream();
                 BufferedReader rd = new BufferedReader(new InputStreamReader(is));
                 String line;
@@ -438,9 +431,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             }else{
 
-                Toast.makeText(LoginActivity.this, "Error con el Email o la Contraseña", Toast.LENGTH_LONG).show();
-//                mPasswordView.setError(getString(R.string.error_incorrect_password));
-//                mPasswordView.requestFocus();
+                Snackbar.make(mLoginFormView, R.string.error_incorrect_password, Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
             }
         }
 

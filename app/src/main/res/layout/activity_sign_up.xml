@@ -37,15 +37,18 @@
                 android:id="@+id/imageView2"
                 android:src="@drawable/logo"
                 android:layout_gravity="center_horizontal" />
-
-            <AutoCompleteTextView
-                android:id="@+id/autoCompleteTextView"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/name"
-                android:inputType="textEmailAddress"
-                android:maxLines="1"
-                android:singleLine="true" />
+                android:layout_height="wrap_content">
+                <AutoCompleteTextView
+                    android:id="@+id/name_user"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/name"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+            </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -80,25 +83,29 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <EditText
-                android:id="@+id/editText"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/pass_confirm"
-                android:imeActionId="@+id/login"
-                android:imeActionLabel="@string/action_sign_in_short"
-                android:imeOptions="actionUnspecified"
-                android:inputType="textPassword"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="0.72" />
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/confirm_pass"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/pass_confirm"
+                    android:imeActionId="@+id/login"
+                    android:imeActionLabel="@string/action_sign_in_short"
+                    android:imeOptions="actionUnspecified"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="0.72" />
+            </android.support.design.widget.TextInputLayout>
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/acept_terms"
-                android:id="@+id/checkBox"
+                android:id="@+id/tos"
                 android:layout_gravity="center_horizontal" />
 
             <Button
