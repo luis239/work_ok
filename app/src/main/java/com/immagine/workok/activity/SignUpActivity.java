@@ -230,7 +230,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             cancel = true;
         }
 
-        if (!TextUtils.isEmpty(confirmPass) && !isPasswordValid(password)) {
+        if (confirmPass.isEmpty()) {
             confirmPassword.setError(getString(R.string.error_field_required));
             focusView = confirmPassword;
             cancel = true;
@@ -299,7 +299,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         final ProgressDialog progressDialog = new ProgressDialog(SignUpActivity.this,
                 R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Registrnado...");
+        progressDialog.setMessage("Registrando...");
         progressDialog.show();
 
 
@@ -426,13 +426,13 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
                 String responseStr = response.toString();
                 JSONObject jsonObj = new JSONObject(responseStr);
                 if(jsonObj.getString("success").equals("1")){
-                    JSONArray dataArray = jsonObj.getJSONArray("data");
+                    /*JSONArray dataArray = jsonObj.getJSONArray("data");
                     if (dataArray.length()>0) {
                         JSONObject data = dataArray.getJSONObject(0);
                         User user = new User();
                         user.setFullname(data.getString("fullname"));
 
-                    }
+                    }*/
                     Log.d("Server response", responseStr);
                     return true;
                 }else{
@@ -459,14 +459,12 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         protected void onPostExecute(final Boolean success) {
 
             if (success) {
-                if (success) {
 
                     Intent intent = new Intent(SignUpActivity.this,LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
 
 
-                }
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();

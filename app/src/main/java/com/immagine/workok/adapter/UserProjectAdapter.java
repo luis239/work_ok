@@ -36,11 +36,13 @@ public class UserProjectAdapter extends RecyclerView.Adapter<UserProjectAdapter.
         public ImageView imagen;
         public TextView nombre;
         public CheckBox checkBox;
+        public TextView email;
 
         public UserProjectViewHolder(View v) {
             super(v);
             imagen = (ImageView) v.findViewById(R.id.imageButton);
             nombre = (TextView) v.findViewById(R.id.nombre);
+            email = (TextView) v.findViewById(R.id.email);
             checkBox = (CheckBox) v.findViewById(R.id.checkBox);
             imagen.setOnClickListener(this);
             checkBox.setOnClickListener(this);
@@ -100,7 +102,8 @@ public class UserProjectAdapter extends RecyclerView.Adapter<UserProjectAdapter.
             holder.checkBox.setVisibility(View.INVISIBLE);
         }
 
-        holder.nombre.setText(items.get(position).getUsername());
+        holder.nombre.setText(items.get(position).getFullname());
+        holder.email.setText(items.get(position).getUsername());
 
     }
 

@@ -1,52 +1,67 @@
 package com.immagine.workok.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
+import com.immagine.workok.Constants;
 import com.immagine.workok.R;
 import com.immagine.workok.adapter.ProjectAdapter;
+import com.immagine.workok.adapter.TaskProjectAdapter;
 import com.immagine.workok.adapter.UserProjectAdapter;
 import com.immagine.workok.model.Project;
+import com.immagine.workok.model.Task;
 import com.immagine.workok.model.User;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProyectDetailsActivity extends AppCompatActivity {
+public class ProyectDetailsActivity extends AppCompatActivity implements TaskProjectAdapter.OnItemClickListener {
 
 
     private Activity act;
     private RecyclerView recycler;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager lManager;
-    private List<Project> items = new ArrayList<>();
+    private List<Task> items = new ArrayList<>();
     private FloatingActionButton addTask;
     private FloatingActionButton addUser;
     private FloatingActionButton editProyect;
+    private  TaskListTask mTask = null;
+    private Project project;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_proyect_details);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-/*        items.add(new User("Luis Fagundez", 2));
-        items.add(new User("Jumi", 3));
-        items.add(new User("Ricardo", 1));
-        items.add(new User("Jose", 8));
-        items.add(new User("Kira", 5));
-        items.add(new User("Naruto", 10));
-        items.add(new User("Danerys", 35));
-        items.add(new User("Jon Snow", 80));
-        items.add(new User("Rick Grimes", 6));*/
 
+        Intent intent = getIntent();
+        project = (Project) intent.getSerializableExtra("project");
+
+
+        TextView title = (TextView) findViewById(R.id.project_title);
+        title.setText(project.getTitle());
         recycler = (RecyclerView) findViewById(R.id.reciclador);
         //recycler.setHasFixedSize(true);
 
@@ -54,9 +69,6 @@ public class ProyectDetailsActivity extends AppCompatActivity {
         lManager = new LinearLayoutManager(act);
         recycler.setLayoutManager(lManager);
 
-        // Crear un nuevo adaptador
-        adapter = new ProjectAdapter(items);
-        recycler.setAdapter(adapter);
 
         addTask = (FloatingActionButton) findViewById(R.id.add_task_fab);
         addUser = (FloatingActionButton) findViewById(R.id.add_user_fab);
@@ -64,7 +76,11 @@ public class ProyectDetailsActivity extends AppCompatActivity {
         addTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putInt("ID",project.getProject_id());
+                bundle.putInt("edit",0);
                 Intent intent =  new Intent(ProyectDetailsActivity.this,NewTaskActivity.class);
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
@@ -82,6 +98,24 @@ public class ProyectDetailsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getTasksListTask(project.getProject_id());
+    }
+
+    private void getTasksListTask(final int project_id) {
+
+
+        mTask = new TaskListTask(project_id,this);
+        mTask.execute((Void) null);
+
+
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -94,5 +128,133 @@ public class ProyectDetailsActivity extends AppCompatActivity {
         else
             return false;
 
+    }
+
+    @Override
+    public void onClick(TaskProjectAdapter.TaskViewHolder holder, int index) {
+        Task task = items.get(index);
+        Intent intent = new Intent(this,NewTaskActivity.class);
+        intent.putExtra("task",task);
+        Bundle bundle = new Bundle();
+        bundle.putInt("edit",1);
+        intent.putExtras(bundle);
+        startActivity(intent);
+
+
+    }
+
+    public class TaskListTask extends AsyncTask<Void, Void, Boolean> {
+
+        private final int projectId;
+
+        ProgressDialog progressDialog;
+        TaskListTask(int project_id,Activity a) {
+            projectId = project_id;
+            progressDialog = new ProgressDialog(a,R.style.AppTheme_Dark_Dialog);
+
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Cargando...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+
+
+
+            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
+            String dataUrlParameters = "project_id="+projectId+"&action="+ Constants.ACTION_LIST_TASK;
+            URL url;
+            HttpURLConnection connection = null;
+            try {
+                // Create connection
+                url = new URL(dataUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Length","" + Integer.toString(dataUrlParameters.getBytes().length));
+                connection.setRequestProperty("Content-Language", "en-US");
+                connection.setUseCaches(false);
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                // Send request
+                DataOutputStream wr = new DataOutputStream(
+                        connection.getOutputStream());
+                wr.writeBytes(dataUrlParameters);
+                wr.flush();
+                wr.close();
+                // Get Response
+                InputStream is = connection.getInputStream();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                String line;
+                StringBuffer response = new StringBuffer();
+
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
+
+                String responseStr = response.toString();
+                JSONObject jsonObj = new JSONObject(responseStr);
+                if(jsonObj.getString("success").equals("1")){
+                    JSONArray dataArray = jsonObj.getJSONArray("data");
+                    items.clear();
+                    for (int i = 0;i<dataArray.length();i++) {
+
+                        JSONObject data = dataArray.getJSONObject(i);
+                        Task task = new Task(data.getString("title"),
+                                data.getString("description"),data.getString("date_start"),data.getString("date_end"),data.getInt("percentage"),
+                                data.getInt("status_id"),data.getInt("project_id"),data.getInt("user_id"),data.getInt("task_id"));
+                        items.add(task);
+                    }
+                    Log.d("Server response",responseStr);
+                    return true;
+                }else{
+
+
+                    return false;
+                }
+
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return false;
+
+            } finally {
+
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mTask = null;
+            if (success) {
+
+                adapter = new TaskProjectAdapter(items,ProyectDetailsActivity.this);
+                recycler.setAdapter(adapter);
+
+            }else{
+
+
+            }
+            progressDialog.dismiss();
+        }
+
+        @Override
+        protected void onCancelled() {
+            mTask = null;
+            //showProgress(false);
+        }
     }
 }

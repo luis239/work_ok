@@ -1,6 +1,7 @@
 package com.immagine.workok.activity;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -28,7 +29,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.immagine.workok.R;
 import com.immagine.workok.model.User;
@@ -74,6 +74,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private User user = new User();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +110,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             public void onClick(View v) {
                 Intent signUp = new Intent(LoginActivity.this,SignUpActivity.class);
                 startActivity(signUp);
-                finish();
 
             }
         });
@@ -224,57 +224,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Shows the progress UI and hides the login form.
      */
     private void showProgress(final String email, final String password) {
-       /* // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }*/
-//
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
-                R.style.AppTheme_Dark_Dialog);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Autenticando...");
-        progressDialog.show();
-
-
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onLoginSuccess or onLoginFailed
-                        //onLoginSuccess();
-                        mAuthTask = new UserLoginTask(email, password);
-                        mAuthTask.execute((Void) null);
-                        progressDialog.dismiss();
-                        // onLoginFailed();
-
-                    }
-                }, 3000);
-//
-
+        mAuthTask = new UserLoginTask(email, password,LoginActivity.this);
+        mAuthTask.execute((Void) null);
 
     }
 
@@ -340,12 +292,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mUser;
         private final String mPassword;
-
-        UserLoginTask(String email, String password) {
+        private ProgressDialog progressDialog;
+        UserLoginTask(String email, String password,Activity a) {
             mUser = email;
             mPassword = password;
+            progressDialog = new ProgressDialog(a,R.style.AppTheme_Dark_Dialog);
         }
 
+
+
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Autenticando...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
@@ -392,8 +354,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     dataArray = jsonObj.getJSONArray("data");
                     JSONObject data = new JSONObject();
                     data = dataArray.getJSONObject(0);
-                    User user = new User();
+
                     user.setFullname(data.getString("fullname"));
+                    user.setUser_id(data.getInt("user_id"));
                     Log.d("Server response",responseStr);
                     return true;
                 }else{
@@ -424,6 +387,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             //showProgress(false);
             if (success) {
 
+                User.user.setUser_id(user.getUser_id());
+                User.user.setFullname(user.getFullname());
                 Intent intent = new Intent(LoginActivity.this,MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
@@ -435,6 +400,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         .setAction("Action", null).show();
 
             }
+            progressDialog.dismiss();
         }
 
         @Override

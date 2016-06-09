@@ -12,6 +12,8 @@ public class User {
     int user_id;
     boolean isSelected;
 
+    public static User user = new User();
+
     public User() {
 
         this.username = "";
@@ -23,8 +25,9 @@ public class User {
 
     }
 
-    public User(String username, int user_id) {
+    public User(String username, String fullname, int user_id) {
         this.username = username;
+        this.fullname = fullname;
         this.user_id = user_id;
         this.isSelected = false;
     }

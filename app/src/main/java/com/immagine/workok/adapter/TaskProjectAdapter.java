@@ -9,35 +9,37 @@ import android.widget.TextView;
 
 import com.immagine.workok.R;
 import com.immagine.workok.model.Project;
+import com.immagine.workok.model.Task;
 
 import java.util.List;
 
 /**
  * Created by Alejandro on 29/05/2016.
  */
-public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectViewHolder> {
+public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.TaskViewHolder> {
 
 
-    private List<Project> items;
+    private List<Task> items;
     private boolean isDetail = false;
 
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onClick(ProjectViewHolder holder, int index);
+        void onClick(TaskViewHolder holder, int index);
     }
 
-    public class ProjectViewHolder extends RecyclerView.ViewHolder implements  View.OnClickListener {
+    public class TaskViewHolder extends RecyclerView.ViewHolder implements  View.OnClickListener {
         // Campos respectivos de un item
-        public ImageView imagen;
+        public ImageView imageButton;
         public TextView nombre;
         public TextView visitas;
 
-        public ProjectViewHolder(View v) {
+        public TaskViewHolder(View v) {
             super(v);
-            //imagen = (ImageView) v.findViewById(R.id.imagen);
+            imageButton = (ImageView) v.findViewById(R.id.imageButton);
             nombre = (TextView) v.findViewById(R.id.nombre);
             visitas = (TextView) v.findViewById(R.id.visitas);
+            imageButton.setImageResource(android.R.drawable.ic_menu_edit);
             v.setOnClickListener(this);
         }
 
@@ -47,33 +49,31 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
         }
     }
 
-    public ProjectAdapter(List<Project> items) {
+    public TaskProjectAdapter(List<Task> items) {
 
         this.items = items;
     }
 
-        public ProjectAdapter(List<Project> items,OnItemClickListener listener) {
+        public TaskProjectAdapter(List<Task> items, OnItemClickListener listener) {
 
             this.items = items;
             this.listener = listener;
         }
 
     @Override
-    public ProjectViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public TaskViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.project_card, viewGroup, false);
-        return new ProjectViewHolder(v);
+        return new TaskViewHolder(v);
     }
 
+
+
     @Override
-    public void onBindViewHolder(ProjectViewHolder holder, int position) {
+    public void onBindViewHolder(TaskViewHolder holder, int position) {
 
         holder.nombre.setText(items.get(position).getTitle());
-        if (isDetail){
-            holder.visitas.setText("Completado: "+String.valueOf(items.get(position).getPercentage())+"%");
-        }else {
-            holder.visitas.setText("Completado: " + String.valueOf(items.get(position).getPercentage()) + "%");
-        }
+        //holder.visitas.setText("Asignado a: " + items.get(position).getTitle());
     }
 
     @Override

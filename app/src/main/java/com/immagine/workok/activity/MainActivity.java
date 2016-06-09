@@ -1,10 +1,15 @@
 package com.immagine.workok.activity;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,17 +21,28 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.immagine.workok.Constants;
 import com.immagine.workok.R;
 import com.immagine.workok.adapter.ProjectAdapter;
 import com.immagine.workok.model.Project;
+import com.immagine.workok.model.User;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.immagine.workok.R.id.reciclador;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,ProjectAdapter.OnItemClickListener {
 
 
 
@@ -34,6 +50,9 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager lManager;
     private TextView message;
+    private ProjectListTask mTask = null;
+    private List<Project> items = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,8 +69,6 @@ public class MainActivity extends AppCompatActivity
 
                 Intent intent = new Intent(MainActivity.this, NewProjectActivity.class);
                 startActivity(intent);
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
             }
         });
 
@@ -65,17 +82,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        List<Project> items = new ArrayList<>();
-
-        items.add(new Project("Project 1", "Angel Beats", 20));
-        items.add(new Project("Project 2", "Death Note", 30));
-//        items.add(new Project("Project 3", "Fate Stay Night", 100));
-//        items.add(new Project("Project 4", "Welcome to the NHK", 80));
-//        items.add(new Project("Project 5", "Suzumiya Haruhi", 35));
-
         message = (TextView)findViewById(R.id.message);
-        if (!items.isEmpty())
-            message.setVisibility(View.GONE);
         recycler = (RecyclerView) findViewById(reciclador);
         //recycler.setHasFixedSize(true);
 
@@ -84,8 +91,20 @@ public class MainActivity extends AppCompatActivity
         recycler.setLayoutManager(lManager);
 
         // Crear un nuevo adaptador
-        adapter = new ProjectAdapter(items);
-        recycler.setAdapter(adapter);
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getProjects(User.user.getUser_id());
+    }
+
+    private void getProjects(final int user_id) {
+        mTask = new ProjectListTask(user_id,MainActivity.this);
+        mTask.execute((Void) null);
+
 
     }
 
@@ -138,13 +157,11 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(MainActivity.this,ProyectDetailsActivity.class);
             startActivity(intent);
 
-        } else if (id == R.id.nav_slideshow) {
-
         } else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
-
         } else if (id == R.id.nav_send) {
+
+            finish();
 
         }
 
@@ -153,5 +170,135 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void onClick(ProjectAdapter.ProjectViewHolder holder, int index) {
 
+        Project project = items.get(index);
+        Intent intent = new Intent(this,ProyectDetailsActivity.class);
+        intent.putExtra("project",project);
+        startActivity(intent);
+    }
+
+
+    public class ProjectListTask extends AsyncTask<Void, Void, Boolean> {
+
+        private final int userId;
+
+        ProgressDialog progressDialog;
+
+        ProjectListTask(int userId,Activity a) {
+            this.userId = userId;
+            progressDialog = new ProgressDialog(a,R.style.AppTheme_Dark_Dialog);
+
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Cargando...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+
+
+
+            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
+            String dataUrlParameters = "user_id="+userId+"&action="+ Constants.ACTION_LIST_PROJECT;
+            URL url;
+            HttpURLConnection connection = null;
+            try {
+                // Create connection
+                url = new URL(dataUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Length","" + Integer.toString(dataUrlParameters.getBytes().length));
+                connection.setRequestProperty("Content-Language", "en-US");
+                connection.setUseCaches(false);
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                // Send request
+                DataOutputStream wr = new DataOutputStream(
+                        connection.getOutputStream());
+                wr.writeBytes(dataUrlParameters);
+                wr.flush();
+                wr.close();
+                // Get Response
+                InputStream is = connection.getInputStream();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                String line;
+                StringBuffer response = new StringBuffer();
+
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
+
+                String responseStr = response.toString();
+                JSONObject jsonObj = new JSONObject(responseStr);
+                if(jsonObj.getString("success").equals("1")){
+                    JSONArray dataArray = jsonObj.getJSONArray("data");
+                    items.clear();
+                    for (int i = 0;i<dataArray.length();i++) {
+
+                        JSONObject data = dataArray.getJSONObject(i);
+                        Project project = new Project(data.getString("title"),
+                                data.getString("description"),data.getString("date_start"),data.getString("date_end"),data.getInt("percentage"),
+                                data.getInt("project_id"),data.getInt("status_id"));
+                        items.add(project);
+                    }
+                    Log.d("Server response",responseStr);
+                    return true;
+                }else{
+
+
+                    return false;
+                }
+
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return false;
+
+            } finally {
+
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mTask = null;
+
+            //showProgress(false);
+            if (success) {
+
+                if (!items.isEmpty())
+                    message.setVisibility(View.GONE);
+
+                adapter = new ProjectAdapter(items,MainActivity.this);
+                recycler.setAdapter(adapter);
+
+            }else{
+
+
+            }
+            progressDialog.dismiss();
+        }
+
+        @Override
+        protected void onCancelled() {
+            mTask = null;
+            //showProgress(false);
+        }
+    }
 }

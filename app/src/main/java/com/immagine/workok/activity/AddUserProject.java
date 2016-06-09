@@ -2,21 +2,36 @@ package com.immagine.workok.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.immagine.workok.Constants;
 import com.immagine.workok.R;
+import com.immagine.workok.adapter.ProjectAdapter;
 import com.immagine.workok.adapter.UserProjectAdapter;
+import com.immagine.workok.model.Project;
 import com.immagine.workok.model.User;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +44,8 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
     private AlertDialog.Builder alertDialog;
     private AlertDialog dialog;
     private List<User> items = new ArrayList<>();
+    private UserListTask mTask = null;
+    private int projectId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +64,11 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
             }
         });
 
-        items.add(new User("Persona 1", 2));
-        items.add(new User("Persona 2", 3));
-        items.add(new User("Persona 3", 1));
-        items.add(new User("Persona 4", 8));
-        items.add(new User("Persona 5", 5));
+        items.add(new User("Persona 1","luis", 2));
+        items.add(new User("Persona 2","jumi", 3));
+        items.add(new User("Persona 3","user1", 1));
+        items.add(new User("Persona 4","user2",8));
+        items.add(new User("Persona 5","peter", 5));
 
         recycler = (RecyclerView) findViewById(R.id.listView);
         //recycler.setHasFixedSize(true);
@@ -63,6 +80,38 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
         // Crear un nuevo adaptador
         adapter = new UserProjectAdapter(items,this);
         recycler.setAdapter(adapter);
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //getUsersList();
+    }
+
+    private void getUsersList() {
+
+        final ProgressDialog progressDialog = new ProgressDialog(AddUserProject.this,
+                R.style.AppTheme_Dark_Dialog);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Cargando...");
+        progressDialog.show();
+
+
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        // On complete call either onLoginSuccess or onLoginFailed
+                        //onLoginSuccess();
+                        mTask = new UserListTask();
+                        mTask.execute((Void) null);
+                        progressDialog.dismiss();
+                        // onLoginFailed();
+
+                    }
+                }, 3000);
+
+
     }
 
     private void dialogAddUser() {
@@ -114,4 +163,109 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
         items.addAll(itemsSelected);
         adapter.notifyItemInserted(pos);
     }
+
+
+    public class UserListTask extends AsyncTask<Void, Void, Boolean> {
+
+
+        UserListTask() {
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+
+
+
+            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
+            String dataUrlParameters = "&action="+ Constants.ACTION_LIST;
+            URL url;
+            HttpURLConnection connection = null;
+            try {
+                // Create connection
+                url = new URL(dataUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Length","" + Integer.toString(dataUrlParameters.getBytes().length));
+                connection.setRequestProperty("Content-Language", "en-US");
+                connection.setUseCaches(false);
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                // Send request
+                DataOutputStream wr = new DataOutputStream(
+                        connection.getOutputStream());
+                wr.writeBytes(dataUrlParameters);
+                wr.flush();
+                wr.close();
+                // Get Response
+                InputStream is = connection.getInputStream();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                String line;
+                StringBuffer response = new StringBuffer();
+
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
+
+                String responseStr = response.toString();
+                JSONObject jsonObj = new JSONObject(responseStr);
+                if(jsonObj.getString("success").equals("1")){
+                    JSONArray dataArray = jsonObj.getJSONArray("data");
+                    items.clear();
+                    for (int i = 0;i<dataArray.length();i++) {
+
+                        JSONObject data = dataArray.getJSONObject(i);
+                        User user = new User(data.getString("username"),
+                                data.getString("fullname"),data.getInt("user_id"));
+                        items.add(user);
+                    }
+                    Log.d("Server response",responseStr);
+                    return true;
+                }else{
+
+
+                    return false;
+                }
+
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return false;
+
+            } finally {
+
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+
+        }
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mTask = null;
+
+            //showProgress(false);
+            if (success) {
+
+                adapter = new UserProjectAdapter(items,AddUserProject.this);
+                recycler.setAdapter(adapter);
+
+            }else{
+
+
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mTask = null;
+            //showProgress(false);
+        }
+    }
+
 }

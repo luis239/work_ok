@@ -2,6 +2,9 @@ package com.immagine.workok.activity;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -15,9 +18,21 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.immagine.workok.Constants;
 import com.immagine.workok.R;
+import com.immagine.workok.model.User;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -34,6 +49,7 @@ public class NewProjectActivity extends AppCompatActivity {
     private EditText name;
     private EditText description;
     private LinearLayout container;
+    private CreateProjectTask mTask = null;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,8 +101,8 @@ public class NewProjectActivity extends AppCompatActivity {
         description.setError(null);
 
 
-        String desc = description.getText().toString();
-        String name = this.name.getText().toString();
+        final String desc = description.getText().toString();
+        final String name = this.name.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -112,16 +128,24 @@ public class NewProjectActivity extends AppCompatActivity {
         }
         if(initDate.after(finishDate)){
 
-            startDate.setError("Fecha inicial no puede estar despues de la fecha final");
+            startDate.setError("");
             focusView = startDate;
             Snackbar.make(container, "Fecha inicial no puede estar despues de la fecha final", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             cancel = true;
         }
 
+/*        if(initDate.before(Calendar.getInstance().getTime())){
+
+            startDate.setError("");
+            focusView = startDate;
+            Snackbar.make(container, "Fecha no puede ser menor al dia Actual", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            cancel = true;
+        }*/
         if(initDate.equals(finishDate)){
 
-            startDate.setError("Fecha inicial no puede estar despues de la fecha final");
+            startDate.setError("");
             focusView = startDate;
             Snackbar.make(container, "Las Fechas no pueden ser iguales", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
@@ -135,16 +159,127 @@ public class NewProjectActivity extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            //createProject(name,email, password);
+
+            final ProgressDialog progressDialog = new ProgressDialog(NewProjectActivity.this,
+                    R.style.AppTheme_Dark_Dialog);
+            progressDialog.setIndeterminate(true);
+            progressDialog.setMessage("Guardando...");
+            progressDialog.show();
+
+
+            new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            // On complete call either onLoginSuccess or onLoginFailed
+                            //onLoginSuccess();
+                            mTask = new CreateProjectTask(name,desc, startDate.getText().toString(),endDate.getText().toString(),User.user.getUser_id());
+                            mTask.execute((Void) null);
+                            progressDialog.dismiss();
+                            // onLoginFailed();
+
+                        }
+                    }, 3000);
+
             Log.d("Tag","Pressed");
 
         }
     }
 
-    public void createProject(String nameProject,String description,String dateStart,String dateEnd,int userId){
+    public class CreateProjectTask extends AsyncTask<Void, Void, Boolean> {
+
+        String nameProject;
+        String description;
+        String dateStart;
+        String dateEnd;
+        int userId;
+
+        public CreateProjectTask(String nameProject, String description, String dateStart, String dateEnd, int userId) {
+            this.nameProject = nameProject;
+            this.description = description;
+            this.dateStart = dateStart;
+            this.dateEnd = dateEnd;
+            this.userId = userId;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
+            String dataUrlParameters = "title="+nameProject+"&description="+description+"&date_start="+dateStart+"&date_end="+dateEnd
+                    +"&user_id="+userId+"&action="+ Constants.ACTION_CREATE;
+            URL url;
+            HttpURLConnection connection = null;
+            try {
+                // Create connection
+                url = new URL(dataUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Length","" + Integer.toString(dataUrlParameters.getBytes().length));
+                connection.setRequestProperty("Content-Language", "en-US");
+                connection.setUseCaches(false);
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                // Send request
+                DataOutputStream wr = new DataOutputStream(
+                        connection.getOutputStream());
+                wr.writeBytes(dataUrlParameters);
+                wr.flush();
+                wr.close();
+                // Get Response
+                InputStream is = connection.getInputStream();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                String line;
+                StringBuffer response = new StringBuffer();
+
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
+
+                String responseStr = response.toString();
+                JSONObject jsonObj = new JSONObject(responseStr);
+                if(jsonObj.getString("success").equals("1")){
+                    Log.d("Server response", responseStr);
+                    return true;
+                }else{
+                    return false;
+                }
 
 
+            } catch (Exception e) {
 
+                e.printStackTrace();
+                return false;
+
+            } finally {
+
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+
+            if (success) {
+                if (success) {
+
+                    Toast.makeText(NewProjectActivity.this,"Proyecto Creado Exitosamente",Toast.LENGTH_LONG).show();
+
+                    finish();
+
+                }
+            } else {
+                Toast.makeText(NewProjectActivity.this,"Error",Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mTask = null;
+        }
     }
 
 
@@ -189,12 +324,11 @@ public class NewProjectActivity extends AppCompatActivity {
 
             public void onDateSet(DatePicker view, int year, int month, int day) {
 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
                 startDate.setText(day + "/" + (month + 1) + "/" + year);
                 try {
                     initDate = sdf.parse(startDate.getText().toString());
-                    initDate.setTime(0);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -227,7 +361,6 @@ public class NewProjectActivity extends AppCompatActivity {
             endDate.setText(day + "/" + (month + 1) + "/" + year);
             try {
                 finishDate = sdf.parse(endDate.getText().toString());
-                finishDate.setTime(0);
             } catch (ParseException e) {
                 e.printStackTrace();
             }

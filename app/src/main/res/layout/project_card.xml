@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/imageButton"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentRight="false"
             android:src="@android:drawable/ic_menu_share"
             android:background="@color/hint_foreground_material_light" />
 

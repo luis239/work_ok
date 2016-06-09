@@ -1,9 +1,11 @@
 package com.immagine.workok.model;
 
+import java.io.Serializable;
+
 /**
  * Created by Alejandro on 29/05/2016.
  */
-public class Project {
+public class Project implements Serializable {
 
 
     private String title;
@@ -14,11 +16,22 @@ public class Project {
     private int status_id;
     private int project_id;
     private boolean selected;
+    //private User userAssigned = new User();
 
     public Project(String title, String description, int percentage) {
         this.title = title;
         this.description = description;
         this.percentage = percentage;
+    }
+
+    public Project(String title, String description, String dateStart, String dateEnd, int percentage, int project_id, int status_id) {
+        this.title = title;
+        this.description = description;
+        this.dateStart = dateStart;
+        this.dateEnd = dateEnd;
+        this.percentage = percentage;
+        this.project_id = project_id;
+        this.status_id = status_id;
     }
 
     public String getTitle() {
@@ -80,4 +93,12 @@ public class Project {
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
+
+    /*public User getUserAssigned() {
+        return userAssigned;
+    }
+
+    public void setUserAssigned(User userAssigned) {
+        this.userAssigned = userAssigned;
+    }*/
 }

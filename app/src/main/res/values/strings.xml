@@ -7,7 +7,7 @@
     <string name="action_sign_in">Ingresar</string>
     <string name="action_sign_in_short">Ingresar</string>
     <string name="error_invalid_email">Email no Válido</string>
-    <string name="error_invalid_password">Contraseña muy COrta</string>
+    <string name="error_invalid_password">Contraseña muy Corta</string>
     <string name="error_incorrect_password">Contraseña o nombre de usuario inválido</string>
     <string name="error_field_required">Campo Requerido</string>
     <string name="error_password_not_match">La Contraseña no coincide</string>

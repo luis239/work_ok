@@ -1,9 +1,11 @@
 package com.immagine.workok.model;
 
+import java.io.Serializable;
+
 /**
  * Created by Alejandro on 07/06/2016.
  */
-public class Task {
+public class Task implements Serializable {
 
     String title;
     String description;

@@ -57,14 +57,16 @@
             <RadioGroup
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal">
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/radioGroup">
 
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/in_progress"
                     android:id="@+id/radioButton"
-                    android:layout_gravity="center_horizontal" />
+                    android:layout_gravity="center_horizontal"
+                    android:checked="true" />
 
                 <RadioButton
                     android:layout_width="wrap_content"
@@ -101,7 +103,7 @@
                 <EditText
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/editText5"
+                    android:id="@+id/percent"
                     android:layout_weight="1"
                     android:textAlignment="center"
                     android:inputType="number" />
@@ -122,7 +124,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:ems="10"
-                android:id="@+id/editText4"
+                android:id="@+id/observaciones"
                 android:lines="3"
                 android:hint="@string/notes" />
 
