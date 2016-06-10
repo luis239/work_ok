@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
 import com.immagine.workok.Constants;
+import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
 import com.immagine.workok.adapter.ProjectAdapter;
 import com.immagine.workok.adapter.TaskProjectAdapter;
@@ -87,7 +88,10 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
         addUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putInt("ID_PROJECT",project.getProject_id());
                 Intent intent =  new Intent(ProyectDetailsActivity.this,AddUserProject.class);
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
@@ -103,10 +107,14 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
     }
 
 
+
     @Override
     protected void onResume() {
         super.onResume();
         getTasksListTask(project.getProject_id());
+        PreferencesUtil preference = new PreferencesUtil(this);
+        User.user.setUser_id(preference.getUserId());
+        User.user.setFullname(preference.getUserName());
     }
 
     private void getTasksListTask(final int project_id) {

@@ -2,7 +2,9 @@ package com.immagine.workok.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -22,6 +24,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.immagine.workok.Constants;
+import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
 import com.immagine.workok.adapter.ProjectAdapter;
 import com.immagine.workok.model.Project;
@@ -29,6 +32,7 @@ import com.immagine.workok.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -78,9 +82,12 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+//        TextView userName = (TextView) navigationView.getHeaderView(R.id.username);
+//        userName.setText(User.user.getFullname());
 
         message = (TextView)findViewById(R.id.message);
         recycler = (RecyclerView) findViewById(reciclador);
@@ -99,6 +106,9 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         getProjects(User.user.getUser_id());
+        PreferencesUtil preference = new PreferencesUtil(this);
+        User.user.setUser_id(preference.getUserId());
+        User.user.setFullname(preference.getUserName());
     }
 
     private void getProjects(final int user_id) {
@@ -152,12 +162,16 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(MainActivity.this,AddUserProject.class);
             startActivity(intent);
 
-        } else if (id == R.id.nav_gallery) {
+        }
+        else if (id == R.id.gantter) {
 
-            Intent intent = new Intent(MainActivity.this,ProyectDetailsActivity.class);
+            Intent intent = new Intent(MainActivity.this,GantterActivity.class);
             startActivity(intent);
 
-        } else if (id == R.id.nav_manage) {
+        }else if (id == R.id.nav_manage) {
+
+            Intent intent = new Intent(MainActivity.this,GantterActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_send) {
 

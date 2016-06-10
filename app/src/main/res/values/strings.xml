@@ -58,5 +58,7 @@
     <string name="message_new_project">Presione el símbolo de + para crear un nuevo proyecto</string>
     <string name="title_activity_new_project">Nuevo Proyecto</string>
     <string name="exit">Salir</string>
+    <string name="export">Exportar</string>
+    <string name="graph_gantt">Graficar Gantter</string>
 
 </resources>

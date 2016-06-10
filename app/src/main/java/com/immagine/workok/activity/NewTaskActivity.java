@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.immagine.workok.Constants;
+import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
 import com.immagine.workok.model.Project;
 import com.immagine.workok.model.Task;
@@ -102,7 +103,13 @@ public class NewTaskActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isEdit == 0)
+                if(Integer.parseInt(percent.getText().toString()) > 100){
+                    percent.setError("Porcentaje no puede ser mayor a 100");
+                    percent.requestFocus();
+                } else if (percent.getText().toString().length() == 0) {
+                    percent.setError("Introduzca el Porcentaje");
+                    percent.requestFocus();
+                }else if(isEdit == 0)
                     createTask();
                 else
                     updateTask();
@@ -132,6 +139,15 @@ public class NewTaskActivity extends AppCompatActivity {
 
 
         }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PreferencesUtil preference = new PreferencesUtil(this);
+        User.user.setUser_id(preference.getUserId());
+        User.user.setFullname(preference.getUserName());
 
     }
 
@@ -174,7 +190,7 @@ public class NewTaskActivity extends AppCompatActivity {
         int userId,project_id,status_id,percentage;
         ProgressDialog progressDialog;
 
-        public CreateTask(String nameProject, String description, String dateStart, String dateEnd, int project_id,int status_id,int percentage , int user_id, Activity a) {
+        public CreateTask(String nameProject, String description, String dateStart, String dateEnd, int project_id,int status_id,int user_id,int percentage ,  Activity a) {
             this.nameTask = nameProject;
             this.description = description;
             this.dateStart = dateStart;

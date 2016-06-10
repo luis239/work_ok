@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.immagine.workok.Constants;
+import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
 import com.immagine.workok.model.User;
 
@@ -85,12 +86,15 @@ public class NewProjectActivity extends AppCompatActivity {
                 validateFields();
             }
         });
-
-
-
-
     }
 
+        @Override
+        protected void onResume() {
+            super.onResume();
+            PreferencesUtil preference = new PreferencesUtil(this);
+            User.user.setUser_id(preference.getUserId());
+            User.user.setFullname(preference.getUserName());
+        }
 
     public void validateFields(){
 

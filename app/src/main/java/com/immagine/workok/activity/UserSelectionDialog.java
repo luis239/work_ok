@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,6 +32,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -50,11 +52,13 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
     private List<User>userSelected = new ArrayList<>();
     private UserListTask mTask = null;
     private UploadUserTask mTask2 = null;
+    private int projectId;
 
-    public UserSelectionDialog(Activity a,OnClickAddUser listener) {
+    public UserSelectionDialog(Activity a,OnClickAddUser listener,int projectId) {
         super(a);
         this.act = a;
         this.listener = listener;
+        this.projectId = projectId;
     }
 
     @Override
@@ -84,26 +88,8 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
 
     private void getUsersList() {
 
-        final ProgressDialog progressDialog = new ProgressDialog(this.getContext(),
-                R.style.AppTheme_Dark_Dialog);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Cargando...");
-        progressDialog.show();
-
-
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onLoginSuccess or onLoginFailed
-                        //onLoginSuccess();
-                        mTask = new UserListTask();
+                        mTask = new UserListTask(this.act);
                         mTask.execute((Void) null);
-                        progressDialog.dismiss();
-                        // onLoginFailed();
-
-                    }
-                }, 3000);
-
 
     }
 
@@ -140,9 +126,10 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
                 }
             }
         }
+        uploadUsers(userSelected);
         listener.onClickAdd(userSelected);
         this.cancel();
-        uploadUsers(userSelected);
+
     }
 
     public interface OnClickAddUser{
@@ -153,10 +140,19 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
     public class UserListTask extends AsyncTask<Void, Void, Boolean> {
 
 
-        UserListTask() {
+        ProgressDialog progressDialog;
+        UserListTask(Activity activity) {
 
+            progressDialog = new ProgressDialog(activity,R.style.AppTheme_Dark_Dialog);
         }
 
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Espere...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
@@ -233,17 +229,13 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
         @Override
         protected void onPostExecute(final Boolean success) {
             mTask = null;
-
-            //showProgress(false);
             if (success) {
 
                 adapter = new UserProjectAdapter(items,true,UserSelectionDialog.this);
                 recycler.setAdapter(adapter);
 
-            }else{
-
-
             }
+            progressDialog.dismiss();
         }
 
         @Override
@@ -255,7 +247,7 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
 
     private void uploadUsers(List<User> itemsSelected) {
 
-        mTask2 = new UploadUserTask(itemsSelected,this.getContext());
+        mTask2 = new UploadUserTask(itemsSelected,this.getContext(),projectId);
         mTask2.execute((Void) null);
     }
     public class UploadUserTask extends AsyncTask<Void, Void, Boolean> {
@@ -263,9 +255,11 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
         ProgressDialog progressDialog;
 
         List<User> users;
-        UploadUserTask(List<User> users,Context activity) {
+        int project_id;
+        UploadUserTask(List<User> users,Context activity,int project_id) {
 
             this.users = users;
+            this.project_id = project_id;
             progressDialog = new ProgressDialog(activity,R.style.AppTheme_Dark_Dialog);
         }
 
@@ -280,33 +274,26 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
-            String parameters = "";
-            for (User u:users){
+            JSONObject parameters = new JSONObject();
 
-                parameters+="&user_id[]="+u.getUser_id();
+            String ids = "";
+            for (int i = 0;i< users.size();i++){
 
-            }
-
-
-            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
-            String dataUrlParameters = "action="+ Constants.ACTION_UPLOAD_USERS+parameters;
-            /*JSONArray parameters = new JSONArray();
-
-            for (User u:users){
-                JSONObject ids = new JSONObject();
-                try {
-                    ids.put("user_id",u.getUser_id());
-                    ids.put("action",Constants.ACTION_UPLOAD_USERS);
-                    parameters.put(ids);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                ids += users.get(i).getUser_id();
+                if (i<users.size()-1){
+                    ids+=",";
                 }
 
+            }
+            try {
+                parameters.put("users", ids);
+                parameters.put("project_id",String.valueOf(project_id));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
-            }*/
-
-            //String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
-            //String dataUrlParameters = parameters.toString();
+            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php?action=8";
+            String dataUrlParameters = "users="+ids+"&project_id="+project_id;
             URL url;
             HttpURLConnection connection = null;
             try {
@@ -341,15 +328,6 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
                 String responseStr = response.toString();
                 JSONObject jsonObj = new JSONObject(responseStr);
                 if(jsonObj.getString("success").equals("1")){
-                    JSONArray dataArray = jsonObj.getJSONArray("data");
-                    items.clear();
-                    for (int i = 0;i<dataArray.length();i++) {
-
-                        JSONObject data = dataArray.getJSONObject(i);
-                        User user = new User(data.getString("username"),
-                                data.getString("fullname"),data.getInt("user_id"));
-                        items.add(user);
-                    }
                     Log.d("Server response",responseStr);
                     return true;
                 }else{
@@ -375,17 +353,6 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
         @Override
         protected void onPostExecute(final Boolean success) {
             mTask = null;
-
-            //showProgress(false);
-            if (success) {
-
-                adapter = new UserProjectAdapter(items,UserSelectionDialog.this);
-                recycler.setAdapter(adapter);
-
-            }else{
-
-
-            }
             progressDialog.dismiss();
         }
 

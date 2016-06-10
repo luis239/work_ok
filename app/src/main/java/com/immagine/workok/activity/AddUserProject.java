@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.immagine.workok.Constants;
+import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
 import com.immagine.workok.adapter.ProjectAdapter;
 import com.immagine.workok.adapter.UserProjectAdapter;
@@ -55,6 +57,8 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
+        Bundle bundle = getIntent().getExtras();
+        projectId = bundle.getInt("ID_PROJECT");
         addButton = (Button) findViewById(R.id.addUser);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,11 +68,11 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
             }
         });
 
-        items.add(new User("Persona 1","luis", 2));
+/*        items.add(new User("Persona 1","luis", 2));
         items.add(new User("Persona 2","jumi", 3));
         items.add(new User("Persona 3","user1", 1));
         items.add(new User("Persona 4","user2",8));
-        items.add(new User("Persona 5","peter", 5));
+        items.add(new User("Persona 5","peter", 5));*/
 
         recycler = (RecyclerView) findViewById(R.id.listView);
         //recycler.setHasFixedSize(true);
@@ -77,45 +81,31 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
         lManager = new LinearLayoutManager(this);
         recycler.setLayoutManager(lManager);
 
-        // Crear un nuevo adaptador
+  /*      // Crear un nuevo adaptador
         adapter = new UserProjectAdapter(items,this);
-        recycler.setAdapter(adapter);
+        recycler.setAdapter(adapter);*/
     }
-
 
     @Override
     protected void onResume() {
         super.onResume();
-        //getUsersList();
+        getUsersList();
+        PreferencesUtil preference = new PreferencesUtil(this);
+        User.user.setUser_id(preference.getUserId());
+        User.user.setFullname(preference.getUserName());
+
     }
 
     private void getUsersList() {
 
-        final ProgressDialog progressDialog = new ProgressDialog(AddUserProject.this,
-                R.style.AppTheme_Dark_Dialog);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Cargando...");
-        progressDialog.show();
-
-
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onLoginSuccess or onLoginFailed
-                        //onLoginSuccess();
-                        mTask = new UserListTask();
+                        mTask = new UserListTask(this);
                         mTask.execute((Void) null);
-                        progressDialog.dismiss();
-                        // onLoginFailed();
-
-                    }
-                }, 3000);
 
 
     }
 
     private void dialogAddUser() {
-        UserSelectionDialog cd = new UserSelectionDialog(this,this);
+        UserSelectionDialog cd = new UserSelectionDialog(this,this,projectId);
         cd.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         cd.show();
 
@@ -159,17 +149,28 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
     @Override
     public void onClickAdd(List<User> itemsSelected) {
 
-        int pos = items.size();
+        getUsersList();
+       /* int pos = items.size();
         items.addAll(itemsSelected);
-        adapter.notifyItemInserted(pos);
+        adapter.notifyItemInserted(pos);*/
     }
 
 
     public class UserListTask extends AsyncTask<Void, Void, Boolean> {
 
 
-        UserListTask() {
+        ProgressDialog progressDialog;
+        UserListTask(Activity activity) {
 
+            progressDialog = new ProgressDialog(activity,R.style.AppTheme_Dark_Dialog);
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Espere...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
         }
 
         @Override
@@ -179,7 +180,7 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
 
 
             String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
-            String dataUrlParameters = "&action="+ Constants.ACTION_LIST;
+            String dataUrlParameters = "action=7&project_id="+projectId;
             URL url;
             HttpURLConnection connection = null;
             try {
@@ -255,10 +256,8 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
                 adapter = new UserProjectAdapter(items,AddUserProject.this);
                 recycler.setAdapter(adapter);
 
-            }else{
-
-
             }
+            progressDialog.dismiss();
         }
 
         @Override
