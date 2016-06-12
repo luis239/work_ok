@@ -5,7 +5,7 @@
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_account_multiple_black_36dp"
-            android:title="Lista de Personas" />
+            android:title="Mis Tareas" />
         <item
             android:id="@+id/gantter"
             android:icon="@drawable/ic_details_36"

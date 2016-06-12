@@ -22,7 +22,9 @@ public class Constants {
     public static final int ACTION_LOGIN = 5;
     public static final int ACTION_LIST = 5;
     public static final int ACTION_LIST_PROJECT = 6;
+    public static final int ACTION_LIST_MY_TASKS = 7;
     public static final int ACTION_UPLOAD_USERS = 8;
     public static final int ACTION_LIST_TASK = 10;
+    public static final int ACTION_DELETE_USER_FROM_PROJECT = 9;
 
 }

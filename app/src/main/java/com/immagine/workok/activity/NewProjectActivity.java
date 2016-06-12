@@ -139,14 +139,6 @@ public class NewProjectActivity extends AppCompatActivity {
             cancel = true;
         }
 
-/*        if(initDate.before(Calendar.getInstance().getTime())){
-
-            startDate.setError("");
-            focusView = startDate;
-            Snackbar.make(container, "Fecha no puede ser menor al dia Actual", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-            cancel = true;
-        }*/
         if(initDate.equals(finishDate)){
 
             startDate.setError("");

@@ -4,29 +4,30 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
-import com.getbase.floatingactionbutton.FloatingActionButton;
 
 import com.immagine.workok.Constants;
 import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
 import com.immagine.workok.adapter.ProjectAdapter;
 import com.immagine.workok.adapter.TaskProjectAdapter;
-import com.immagine.workok.adapter.UserProjectAdapter;
 import com.immagine.workok.model.Project;
 import com.immagine.workok.model.Task;
 import com.immagine.workok.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -37,90 +38,39 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProyectDetailsActivity extends AppCompatActivity implements TaskProjectAdapter.OnItemClickListener {
+public class MyTasksActivity extends AppCompatActivity implements TaskProjectAdapter.OnItemClickListener {
 
-
-    private Activity act;
     private RecyclerView recycler;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager lManager;
+    private TextView message;
+    private TaskAssignedListTask mTask = null;
     private List<Task> items = new ArrayList<>();
-    private FloatingActionButton addTask;
-    private FloatingActionButton addUser;
-    private FloatingActionButton editProyect;
-    private  TaskListTask mTask = null;
-    private Project project;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_proyect_details);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
-        Intent intent = getIntent();
-        project = (Project) intent.getSerializableExtra("project");
-
-
-        TextView title = (TextView) findViewById(R.id.project_title);
-        title.setText(project.getTitle());
+        setContentView(R.layout.activity_my_tasks);
+        message = (TextView) findViewById(R.id.message);
         recycler = (RecyclerView) findViewById(R.id.reciclador);
-        //recycler.setHasFixedSize(true);
-
-        // Usar un administrador para LinearLayout
-        lManager = new LinearLayoutManager(act);
+        lManager = new LinearLayoutManager(this);
         recycler.setLayoutManager(lManager);
-
-
-        addTask = (FloatingActionButton) findViewById(R.id.add_task_fab);
-        addUser = (FloatingActionButton) findViewById(R.id.add_user_fab);
-        editProyect = (FloatingActionButton) findViewById(R.id.edit_proyect_fab);
-        addTask.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putInt("ID",project.getProject_id());
-                bundle.putInt("edit",0);
-                Intent intent =  new Intent(ProyectDetailsActivity.this,NewTaskActivity.class);
-                intent.putExtras(bundle);
-                startActivity(intent);
-            }
-        });
-        addUser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putInt("ID_PROJECT",project.getProject_id());
-                Intent intent =  new Intent(ProyectDetailsActivity.this,AddUserProject.class);
-                intent.putExtras(bundle);
-                startActivity(intent);
-            }
-        });
-        editProyect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent =  new Intent(ProyectDetailsActivity.this,NewProjectActivity.class);
-                startActivity(intent);
-            }
-        });
-
-
     }
-
 
 
     @Override
     protected void onResume() {
         super.onResume();
-        getTasksListTask(project.getProject_id());
+        getTasks(User.user.getUser_id());
         PreferencesUtil preference = new PreferencesUtil(this);
         User.user.setUser_id(preference.getUserId());
         User.user.setFullname(preference.getUserName());
     }
 
-    private void getTasksListTask(final int project_id) {
-
-
-        mTask = new TaskListTask(project_id,this);
+    private void getTasks(final int user_id) {
+        mTask = new TaskAssignedListTask(user_id,MyTasksActivity.this);
         mTask.execute((Void) null);
 
 
@@ -138,27 +88,28 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
 
     }
 
+
     @Override
     public void onClick(TaskProjectAdapter.TaskViewHolder holder, int index) {
+
         Task task = items.get(index);
         Intent intent = new Intent(this,NewTaskActivity.class);
         intent.putExtra("task",task);
         Bundle bundle = new Bundle();
         bundle.putInt("edit",1);
-        bundle.putInt("ID",project.getProject_id());
         intent.putExtras(bundle);
         startActivity(intent);
-
-
     }
 
-    public class TaskListTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final int projectId;
+    public class TaskAssignedListTask extends AsyncTask<Void, Void, Boolean> {
+
+        private final int userId;
 
         ProgressDialog progressDialog;
-        TaskListTask(int project_id,Activity a) {
-            projectId = project_id;
+
+        TaskAssignedListTask(int userId,Activity a) {
+            this.userId = userId;
             progressDialog = new ProgressDialog(a,R.style.AppTheme_Dark_Dialog);
 
 
@@ -170,14 +121,15 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
             progressDialog.setCancelable(false);
             progressDialog.show();
         }
+
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
 
 
-            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
-            String dataUrlParameters = "project_id="+projectId+"&action="+ Constants.ACTION_LIST_TASK;
+            String dataUrl = "http://www.jexsantofagasta.cl/workok/wotask.php";
+            String dataUrlParameters = "user_id="+userId+"&action="+ Constants.ACTION_LIST_MY_TASKS;
             URL url;
             HttpURLConnection connection = null;
             try {
@@ -248,9 +200,14 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
         @Override
         protected void onPostExecute(final Boolean success) {
             mTask = null;
+
+            //showProgress(false);
             if (success) {
 
-                adapter = new TaskProjectAdapter(items,ProyectDetailsActivity.this);
+                if (!items.isEmpty())
+                    message.setVisibility(View.GONE);
+
+                adapter = new TaskProjectAdapter(items,MyTasksActivity.this);
                 recycler.setAdapter(adapter);
 
             }else{

@@ -15,6 +15,7 @@ public class Task implements Serializable {
     int status_id;
     int project_id;
     int user_id;
+    String fullname;
     int task_id;
 
 
@@ -28,8 +29,10 @@ public class Task implements Serializable {
         this.project_id = 0;
         this.user_id = 0;
         this.task_id = 0;
+        fullname = null;
+
     }
-    public Task(String title, String description, String date_start, String date_end, int percentage, int status_id, int project_id, int user_id, int task_id) {
+    public Task(String title, String description, String date_start, String date_end, int percentage, int status_id, int project_id, int user_id, int task_id,String fullname) {
         this.title = title;
         this.description = description;
         this.date_start = date_start;
@@ -39,6 +42,7 @@ public class Task implements Serializable {
         this.project_id = project_id;
         this.user_id = user_id;
         this.task_id = task_id;
+        this.fullname = fullname;
     }
 
     public String getTitle() {
@@ -111,5 +115,13 @@ public class Task implements Serializable {
 
     public void setTask_id(int task_id) {
         this.task_id = task_id;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
 }

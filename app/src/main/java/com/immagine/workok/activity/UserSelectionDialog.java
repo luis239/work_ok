@@ -1,9 +1,11 @@
 package com.immagine.workok.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -109,7 +111,10 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
     @Override
     public void onClick(UserProjectAdapter.UserProjectViewHolder holder, int idPromocion) {
 
-        items.get(idPromocion).setSelected(true);
+        if(holder.checkBox.isChecked())
+            items.get(idPromocion).setSelected(true);
+        else
+            items.get(idPromocion).setSelected(false);
 
     }
 
@@ -126,9 +131,23 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
                 }
             }
         }
-        uploadUsers(userSelected);
-        listener.onClickAdd(userSelected);
-        this.cancel();
+        if(!userSelected.isEmpty()) {
+            uploadUsers(userSelected);
+            listener.onClickAdd(userSelected);
+            this.cancel();
+        }else{
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+// Add the buttons
+            builder.setMessage("Debe seleccionar al menos uno");
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                }
+            });
+            AlertDialog dialog = builder.show();
+            dialog.setCanceledOnTouchOutside(true);
+        }
+
+
 
     }
 

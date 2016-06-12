@@ -28,7 +28,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
     }
 
     public class ProjectViewHolder extends RecyclerView.ViewHolder implements  View.OnClickListener {
-        // Campos respectivos de un item
+        public TextView percent;
         public ImageView imagen;
         public TextView nombre;
         public TextView visitas;
@@ -36,8 +36,9 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
         public ProjectViewHolder(View v) {
             super(v);
             //imagen = (ImageView) v.findViewById(R.id.imagen);
+            percent = (TextView) v.findViewById(R.id.percent);
             nombre = (TextView) v.findViewById(R.id.nombre);
-            visitas = (TextView) v.findViewById(R.id.visitas);
+            visitas = (TextView) v.findViewById(R.id.user_assigend);
             v.setOnClickListener(this);
         }
 
@@ -69,6 +70,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
     public void onBindViewHolder(ProjectViewHolder holder, int position) {
 
         holder.nombre.setText(items.get(position).getTitle());
+        holder.percent.setVisibility(View.GONE);
         if (isDetail){
             holder.visitas.setText("Completado: "+String.valueOf(items.get(position).getPercentage())+"%");
         }else {

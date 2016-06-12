@@ -8,8 +8,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.immagine.workok.R;
-import com.immagine.workok.model.Project;
 import com.immagine.workok.model.Task;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -31,14 +32,16 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
     public class TaskViewHolder extends RecyclerView.ViewHolder implements  View.OnClickListener {
         // Campos respectivos de un item
         public ImageView imageButton;
-        public TextView nombre;
-        public TextView visitas;
+        public TextView name;
+        public TextView userAssigned;
+        public TextView percent;
 
         public TaskViewHolder(View v) {
             super(v);
             imageButton = (ImageView) v.findViewById(R.id.imageButton);
-            nombre = (TextView) v.findViewById(R.id.nombre);
-            visitas = (TextView) v.findViewById(R.id.visitas);
+            name = (TextView) v.findViewById(R.id.nombre);
+            userAssigned = (TextView) v.findViewById(R.id.user_assigend);
+            percent = (TextView) v.findViewById(R.id.percent);
             imageButton.setImageResource(android.R.drawable.ic_menu_edit);
             v.setOnClickListener(this);
         }
@@ -72,8 +75,10 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
     @Override
     public void onBindViewHolder(TaskViewHolder holder, int position) {
 
-        holder.nombre.setText(items.get(position).getTitle());
-        //holder.visitas.setText("Asignado a: " + items.get(position).getTitle());
+        holder.name.setText(items.get(position).getTitle());
+        holder.percent.setText("Completado: "+items.get(position).getPercentage()+"%");
+        if(items.get(position).getFullname() != null)
+            holder.userAssigned.setText("Asignado a: " + items.get(position).getFullname());
     }
 
     @Override

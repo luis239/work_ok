@@ -12,39 +12,12 @@
     android:orientation="vertical"
     android:clickable="true">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="120dp"
-        android:id="@+id/imageView4"
-        android:src="@drawable/logo"
-        android:layout_gravity="center" />
-
-    <Button
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/grafico_gantt"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/graph_gantt"
-        android:id="@+id/graph"
-        android:background="#000000"
-        android:textColor="#ffffff"
-        android:layout_marginTop="15dp" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/export"
-        android:id="@+id/save"
-        android:background="#000000"
-        android:textColor="#ffffff"
-        android:layout_marginTop="15dp"/>
-
-    <com.immagine.workok.GraphView
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginTop="10dp"
-        android:id="@+id/grafico_gantt">
-
-    </com.immagine.workok.GraphView>
+        android:layout_height="match_parent"
+        tools:context="lecho.lib.hellocharts.samples.ColumnChartActivity"
+        tools:ignore="MergeRootFrame" />
 
 </LinearLayout>

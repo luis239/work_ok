@@ -86,8 +86,9 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-//        TextView userName = (TextView) navigationView.getHeaderView(R.id.username);
-//        userName.setText(User.user.getFullname());
+        View header = navigationView.getHeaderView(0);
+        TextView userName = (TextView) header.findViewById(R.id.username);
+        userName.setText(User.user.getFullname());
 
         message = (TextView)findViewById(R.id.message);
         recycler = (RecyclerView) findViewById(reciclador);
@@ -159,7 +160,7 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
 
-            Intent intent = new Intent(MainActivity.this,AddUserProject.class);
+            Intent intent = new Intent(MainActivity.this,MyTasksActivity.class);
             startActivity(intent);
 
         }

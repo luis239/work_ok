@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -20,9 +19,7 @@ import android.widget.Button;
 import com.immagine.workok.Constants;
 import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
-import com.immagine.workok.adapter.ProjectAdapter;
 import com.immagine.workok.adapter.UserProjectAdapter;
-import com.immagine.workok.model.Project;
 import com.immagine.workok.model.User;
 
 import org.json.JSONArray;
@@ -46,8 +43,9 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
     private AlertDialog.Builder alertDialog;
     private AlertDialog dialog;
     private List<User> items = new ArrayList<>();
-    private UserListTask mTask = null;
+    private UserListInProjectTask mTask = null;
     private int projectId = 0;
+    private DeletUserProjectTask dTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +96,7 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
 
     private void getUsersList() {
 
-                        mTask = new UserListTask(this);
+                        mTask = new UserListInProjectTask(this);
                         mTask.execute((Void) null);
 
 
@@ -123,16 +121,22 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
 
     }
 
+    public List<User> getListUsers(){
+
+        return items;
+    }
+
     @Override
-    public void onClick(UserProjectAdapter.UserProjectViewHolder holder, final int idPromocion) {
+    public void onClick(UserProjectAdapter.UserProjectViewHolder holder, final int index) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 // Add the buttons
         builder.setMessage("Desea eliminar este usuario?");
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                items.remove(idPromocion);
-                adapter.notifyItemRemoved(idPromocion);
+                dTask = new DeletUserProjectTask(AddUserProject.this,items.get(index).getUser_id(),index);
+                dTask.execute((Void)null);
+
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -156,11 +160,11 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
     }
 
 
-    public class UserListTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserListInProjectTask extends AsyncTask<Void, Void, Boolean> {
 
 
         ProgressDialog progressDialog;
-        UserListTask(Activity activity) {
+        UserListInProjectTask(Activity activity) {
 
             progressDialog = new ProgressDialog(activity,R.style.AppTheme_Dark_Dialog);
         }
@@ -267,4 +271,111 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
         }
     }
 
+    public class DeletUserProjectTask extends AsyncTask<Void, Void, Boolean> {
+
+
+        int userID,index;
+        ProgressDialog progressDialog;
+        DeletUserProjectTask(Activity activity,int userID,int index) {
+
+            this.userID = userID;
+            this.index = index;
+            progressDialog = new ProgressDialog(activity,R.style.AppTheme_Dark_Dialog);
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Espere...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+
+
+
+            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php?action="+ Constants.ACTION_DELETE_USER_FROM_PROJECT;
+            String dataUrlParameters = "users="+userID+"&project_id="+projectId;
+            URL url;
+            HttpURLConnection connection = null;
+            try {
+                // Create connection
+                url = new URL(dataUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Length","" + Integer.toString(dataUrlParameters.getBytes().length));
+                connection.setRequestProperty("Content-Language", "en-US");
+                connection.setUseCaches(false);
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                // Send request
+                DataOutputStream wr = new DataOutputStream(
+                        connection.getOutputStream());
+                wr.writeBytes(dataUrlParameters);
+                wr.flush();
+                wr.close();
+                // Get Response
+                InputStream is = connection.getInputStream();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                String line;
+                StringBuffer response = new StringBuffer();
+
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
+
+                String responseStr = response.toString();
+                JSONObject jsonObj = new JSONObject(responseStr);
+                if(jsonObj.getString("success").equals("1")){
+                    Log.d("Server response",responseStr);
+                    return true;
+                }else{
+
+
+                    return false;
+                }
+
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return false;
+
+            } finally {
+
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+
+        }
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mTask = null;
+
+            //showProgress(false);
+            if (success) {
+
+                adapter = new UserProjectAdapter(items,AddUserProject.this);
+                recycler.setAdapter(adapter);
+                items.remove(index);
+                adapter.notifyItemRemoved(index);
+
+
+            }
+            progressDialog.dismiss();
+        }
+
+        @Override
+        protected void onCancelled() {
+            mTask = null;
+            //showProgress(false);
+        }
+    }
 }

@@ -40,7 +40,7 @@
     <string name="date_start">Fecha de Inicio</string>
     <string name="date_end">Fecha de Fin</string>
     <string name="create_project">Crear Proyecto</string>
-    <string name="add_user">Agregar Persona</string>
+    <string name="add_user">Agregar Persona a Tarea</string>
     <string name="select_add_user">Seleccione las Personas a Agregar</string>
     <string name="add_user_title">Seleccione los usuarios que desea agregar al proyecto</string>
     <string name="add">Agregar</string>
@@ -60,5 +60,8 @@
     <string name="exit">Salir</string>
     <string name="export">Exportar</string>
     <string name="graph_gantt">Graficar Gantter</string>
+    <string name="message_no_task">No tiene ninguna Tarea asociada</string>
+    <string name="no_user_assigned">No posee usuarios Asignados, Click aqui para asignar</string>
+
 
 </resources>

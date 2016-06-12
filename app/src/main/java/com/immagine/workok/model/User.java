@@ -40,6 +40,10 @@ public class User {
         this.user_id = user_id;
     }
 
+    @Override
+    public String toString() {
+        return this.fullname;
+    }
     public String getUsername() {
         return username;
     }
