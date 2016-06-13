@@ -99,6 +99,10 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
             @Override
             public void onClick(View v) {
                 Intent intent =  new Intent(ProyectDetailsActivity.this,NewProjectActivity.class);
+                intent.putExtra("project",project);
+                Bundle bundle = new Bundle();
+                bundle.putInt("edit",1);
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });

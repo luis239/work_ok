@@ -30,7 +30,11 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.immagine.workok.gcm.GCMUtil;
 import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
 import com.immagine.workok.model.User;
@@ -55,23 +59,10 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
+
     private static final int WRITE_EXTERNAL_STORAGE_REQUEST = 0;
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
+      private UserLoginTask mAuthTask = null;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -80,6 +71,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
     private User user = new User();
     PreferencesUtil preference;
+    private RegistroGcmcAsyncTask mGCMTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -339,9 +331,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-
 
             String dataUrl = "http://www.jexsantofagasta.cl/workok/wouser.php";
             String dataUrlParameters = "username="+mUser+"&password="+mPassword+"&action=6";
@@ -419,9 +408,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 User.user.setUser_id(user.getUser_id());
                 User.user.setFullname(user.getFullname());
                 preference.SetUser(User.user);
-                Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+                mGCMTask = new RegistroGcmcAsyncTask(LoginActivity.this);
+                mGCMTask.execute();
+/*                Intent intent = new Intent(LoginActivity.this,MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                startActivity(intent);*/
 
 
             }else{
@@ -439,5 +430,131 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             //showProgress(false);
         }
     }
+
+
+
+    /**
+     * Id to identity READ_CONTACTS permission request.
+     */
+    private static final int REQUEST_READ_CONTACTS = 0;
+
+
+
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+
+
+
+
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private boolean checkPlayServices() {
+        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = googleApiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (googleApiAvailability.isUserResolvableError(resultCode)) {
+                googleApiAvailability.getErrorDialog(this, resultCode,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Log.i(SignUpActivity.class.getSimpleName(), "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+
+
+    public void toMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
+
+
+
+
+
+        /*int codigoEstado = connection.getResponseCode();
+        if(codigoEstado != 200)
+            throw new Exception("Error al procesar registro. Estado Http: " + codigoEstado);
+
+        InputStream inputStream = connection.getInputStream();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"UTF-8"));
+
+        String respuesta = "",linea;
+        while ((linea = bufferedReader.readLine()) != null) {
+            respuesta = respuesta + linea;
+        }
+
+        bufferedReader.close();
+        inputStream.close();
+
+        respuesta = new JSONObject(respuesta).getString("RegistroGcmResult");
+
+        if(!respuesta.equals("OK"))
+            throw new Exception("Error al registrarse en aplicacion servidor: " + respuesta);*/
+
+
+
+    private class RegistroGcmcAsyncTask extends AsyncTask<String , String, Boolean> {
+
+        ProgressDialog mProgressDialog;
+        RegistroGcmcAsyncTask(Activity a){
+
+            mProgressDialog = new ProgressDialog(a,R.style.AppTheme_Dark_Dialog);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mProgressDialog.setMessage("Registrando...");
+            mProgressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(String ... params) {
+
+            try {
+
+                publishProgress("Obteniendo Registration Token en GCM Servers...");
+                String registrationToken = GCMUtil.ObtenerRegistrationTokenEnGcm(getApplicationContext());
+
+                publishProgress("Enviando Registration a mi aplicacion servidor...");
+                boolean respuesta = GCMUtil.RegistrarseEnAplicacionServidor(getApplicationContext(),registrationToken);
+                return respuesta;
+            }
+            catch (Exception ex){
+                ex.printStackTrace();
+                return false;
+            }
+
+        }
+
+        protected void onProgressUpdate(String... progress) {
+            mProgressDialog.setMessage(progress[0]);
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success)
+        {
+            mProgressDialog.dismiss();
+
+            if (success){
+                toMainActivity();
+            }else{
+
+                Toast.makeText(getApplicationContext(),"Error GCM",Toast.LENGTH_LONG);
+            }
+
+        }
+
+    }
+
+
 }
 

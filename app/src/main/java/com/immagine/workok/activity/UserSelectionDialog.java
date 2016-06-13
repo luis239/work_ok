@@ -177,9 +177,10 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
             // TODO: attempt authentication against a network service.
 
 
-
             String dataUrl = "http://www.jexsantofagasta.cl/workok/wouser.php";
-            String dataUrlParameters = "&action="+ Constants.ACTION_LIST;
+            String dataUrlParameters = "action="+ Constants.ACTION_LIST_USER_NOT_IN_PROJECT+"&project_id="+projectId;
+            //String dataUrl = "http://www.jexsantofagasta.cl/workok/wouser.php";
+            //String dataUrlParameters = "&action="+ Constants.ACTION_LIST;
             URL url;
             HttpURLConnection connection = null;
             try {

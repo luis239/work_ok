@@ -1,7 +1,5 @@
 package com.immagine.workok.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -36,9 +34,7 @@ import android.widget.TextView;
 
 import com.immagine.workok.Constants;
 import com.immagine.workok.R;
-import com.immagine.workok.model.User;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -62,19 +58,9 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
      */
     private static final int REQUEST_READ_CONTACTS = 0;
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private SignUpTask mAuthTask = null;
 
-    // UI references.
+
+    private SignUpTask mAuthTask = null;
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
@@ -476,5 +462,6 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             mAuthTask = null;
         }
     }
+
 }
 

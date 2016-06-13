@@ -13,7 +13,7 @@ import com.immagine.workok.model.User;
  */
 public class PreferencesUtil {
 
-    private static final String WORK_OK_PREFERENCES = "truckbu_preferences";
+    private static final String WORK_OK_PREFERENCES = "workok_preferences";
 
     private Context context;
 
@@ -37,5 +37,7 @@ public class PreferencesUtil {
         SharedPreferences sharedPreferences = context.getSharedPreferences(WORK_OK_PREFERENCES, Context.MODE_PRIVATE);
         return sharedPreferences.getString("name", "");
     }
+
+
 
 }

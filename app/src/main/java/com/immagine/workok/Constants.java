@@ -21,6 +21,7 @@ public class Constants {
     public static final int ACTION_DELETE = 4;
     public static final int ACTION_LOGIN = 5;
     public static final int ACTION_LIST = 5;
+    public static final int ACTION_LIST_USER_NOT_IN_PROJECT = 7;
     public static final int ACTION_LIST_PROJECT = 6;
     public static final int ACTION_LIST_MY_TASKS = 7;
     public static final int ACTION_UPLOAD_USERS = 8;

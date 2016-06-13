@@ -17,7 +17,7 @@ public class Task implements Serializable {
     int user_id;
     String fullname;
     int task_id;
-
+    int ownerId;
 
     public Task() {
         this.title = "";
@@ -32,6 +32,21 @@ public class Task implements Serializable {
         fullname = null;
 
     }
+
+    public Task(String title, String description, String date_start, String date_end, int percentage, int status_id, int project_id, int user_id, int task_id,String fullname,int ownerId) {
+        this.title = title;
+        this.description = description;
+        this.date_start = date_start;
+        this.date_end = date_end;
+        this.percentage = percentage;
+        this.status_id = status_id;
+        this.project_id = project_id;
+        this.user_id = user_id;
+        this.task_id = task_id;
+        this.fullname = fullname;
+        this.ownerId = ownerId;
+    }
+
     public Task(String title, String description, String date_start, String date_end, int percentage, int status_id, int project_id, int user_id, int task_id,String fullname) {
         this.title = title;
         this.description = description;
@@ -124,4 +139,5 @@ public class Task implements Serializable {
     public void setFullname(String fullname) {
         this.fullname = fullname;
     }
+
 }

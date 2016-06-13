@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "926901106879",
+    "project_id": "still-minutia-111320"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:926901106879:android:dbe288271b57914d",
+        "android_client_info": {
+          "package_name": "com.immagine.workok"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8Uu0-WgLA68YKbsf7HZ1ubx1f-KVutUs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

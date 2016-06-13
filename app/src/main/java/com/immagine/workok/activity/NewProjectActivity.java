@@ -1,5 +1,6 @@
 package com.immagine.workok.activity;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -14,15 +15,20 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.immagine.workok.Constants;
 import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
+import com.immagine.workok.model.Project;
+import com.immagine.workok.model.Task;
 import com.immagine.workok.model.User;
 
 import org.json.JSONArray;
@@ -51,6 +57,10 @@ public class NewProjectActivity extends AppCompatActivity {
     private EditText description;
     private LinearLayout container;
     private CreateProjectTask mTask = null;
+    private Project project;
+    private static int isEdit;
+    private UpdateProjectTask uTask = null;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +96,51 @@ public class NewProjectActivity extends AppCompatActivity {
                 validateFields();
             }
         });
+
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        if (bundle!= null){
+
+            isEdit = bundle.getInt("edit");
+        }
+        if (isEdit == 1) {
+            project = (Project) intent.getSerializableExtra("project");
+            name.setText(project.getTitle());
+            description.setText(project.getDescription());
+            String dateInit = inverseDate(project.getDateStart());
+            String dateEnd = inverseDate(project.getDateEnd());
+            startDate.setText(dateInit);
+            endDate.setText(dateEnd);
+            createProject.setText("Editar Proyecto");
+            setTitle("Editar Proyecto");
+            initializeDates();
+        }
+
+    }
+
+    private void initializeDates() {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+        try {
+            finishDate = sdf.parse(endDate.getText().toString());
+            initDate = sdf.parse(startDate.getText().toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private String inverseDate(String string) {
+
+        String[] parts = string.split("-");
+        String year = parts[0];
+        String month = parts[1];
+        String day = parts[2];
+        String finalDate= day+"/"+month+"/"+year;
+
+        return finalDate ;
+
     }
 
         @Override
@@ -152,33 +207,20 @@ public class NewProjectActivity extends AppCompatActivity {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
-        } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
+        } else if (isEdit == 0) {
+            mTask = new CreateProjectTask(name, desc, startDate.getText().toString(), endDate.getText().toString(), User.user.getUser_id());
+            mTask.execute((Void) null);
+        }else{
 
-            final ProgressDialog progressDialog = new ProgressDialog(NewProjectActivity.this,
-                    R.style.AppTheme_Dark_Dialog);
-            progressDialog.setIndeterminate(true);
-            progressDialog.setMessage("Guardando...");
-            progressDialog.show();
-
-
-            new android.os.Handler().postDelayed(
-                    new Runnable() {
-                        public void run() {
-                            // On complete call either onLoginSuccess or onLoginFailed
-                            //onLoginSuccess();
-                            mTask = new CreateProjectTask(name,desc, startDate.getText().toString(),endDate.getText().toString(),User.user.getUser_id());
-                            mTask.execute((Void) null);
-                            progressDialog.dismiss();
-                            // onLoginFailed();
-
-                        }
-                    }, 3000);
-
+            updateProject();
             Log.d("Tag","Pressed");
 
         }
+    }
+
+    private void updateProject() {
+        uTask = new UpdateProjectTask(name.getText().toString(), description.getText().toString(), startDate.getText().toString(), endDate.getText().toString(),project.getProject_id(),this);
+        uTask.execute((Void) null);
     }
 
     public class CreateProjectTask extends AsyncTask<Void, Void, Boolean> {
@@ -279,6 +321,117 @@ public class NewProjectActivity extends AppCompatActivity {
     }
 
 
+    public class UpdateProjectTask extends AsyncTask<Void, Void, Boolean> {
+
+        String nameTask;
+        String description;
+        String dateStart;
+        String dateEnd;
+        int userId,project_id,status_id,percentage,task_id;
+        ProgressDialog progressDialog;
+
+        public UpdateProjectTask(String name, String description, String dateStart, String dateEnd,int project_id,Activity a) {
+            this.nameTask = name;
+            this.description = description;
+            this.dateStart = dateStart;
+            this.dateEnd = dateEnd;
+            this.project_id = project_id;
+            progressDialog = new ProgressDialog(a,R.style.AppTheme_Dark_Dialog);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Cargando...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
+            String dataUrlParameters = "title="+nameTask+"&description="+description+"&date_start="+dateStart+"&date_end="+dateEnd
+                    +"&status_id="+status_id+"&project_id="+project_id+"&user_id="+userId+"&task_id="+task_id+"&percentage="+percentage+"&action="+ Constants.ACTION_UPDATE;
+            URL url;
+            HttpURLConnection connection = null;
+            try {
+                // Create connection
+                url = new URL(dataUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Length","" + Integer.toString(dataUrlParameters.getBytes().length));
+                connection.setRequestProperty("Content-Language", "en-US");
+                connection.setUseCaches(false);
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                // Send request
+                DataOutputStream wr = new DataOutputStream(
+                        connection.getOutputStream());
+                wr.writeBytes(dataUrlParameters);
+                wr.flush();
+                wr.close();
+                // Get Response
+                InputStream is = connection.getInputStream();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                String line;
+                StringBuffer response = new StringBuffer();
+
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
+
+                String responseStr = response.toString();
+                JSONObject jsonObj = new JSONObject(responseStr);
+                if(jsonObj.getString("success").equals("1")){
+                    Log.d("Server response", responseStr);
+                    return true;
+                }else{
+                    return false;
+                }
+
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return false;
+
+            } finally {
+
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+
+            if (success) {
+                if (success) {
+
+                    Toast.makeText(NewProjectActivity.this,"Proyecto Actualizado Exitosamente",Toast.LENGTH_LONG).show();
+
+                    finish();
+                    progressDialog.dismiss();
+
+                }
+            } else {
+                Toast.makeText(NewProjectActivity.this,"Error al Actualizar el proyecto",Toast.LENGTH_LONG).show();
+            }
+            progressDialog.dismiss();
+        }
+
+        @Override
+        protected void onCancelled() {
+            mTask = null;
+        }
+    }
+
+
+
+
     public boolean isNameProjectValid(String name){
         if (name.length()>4)
             return true;
@@ -307,28 +460,43 @@ public class NewProjectActivity extends AppCompatActivity {
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
 
-            @Override
-            public Dialog onCreateDialog(Bundle savedInstanceState) {
-                // Use the current date as the default date in the picker
-                final Calendar c = Calendar.getInstance();
-                int year = c.get(Calendar.YEAR);
-                int month = c.get(Calendar.MONTH);
-                int day = c.get(Calendar.DAY_OF_MONTH);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-                return new DatePickerDialog(getActivity(), this, year, month, day);
-            }
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-            public void onDateSet(DatePicker view, int year, int month, int day) {
 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            final Calendar c = Calendar.getInstance();
+            int  year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
 
-                startDate.setText(day + "/" + (month + 1) + "/" + year);
+            if(isEdit == 1) {
                 try {
                     initDate = sdf.parse(startDate.getText().toString());
+                    c.setTime(initDate);
+                    year = c.get(Calendar.YEAR);
+                    month = c.get(Calendar.MONTH);
+                    day = c.get(Calendar.DAY_OF_MONTH);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+
             }
+
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+
+
+            startDate.setText(day + "/" + (month + 1) + "/" + year);
+            try {
+                initDate = sdf.parse(startDate.getText().toString());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
 
 
     }
@@ -340,20 +508,32 @@ public class NewProjectActivity extends AppCompatActivity {
 
     public static class endDatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
-
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current date as the default date in the picker
             final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
+            int  year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
+
+            if(isEdit == 1) {
+                try {
+                    finishDate = sdf.parse(endDate.getText().toString());
+                    c.setTime(finishDate);
+                    year = c.get(Calendar.YEAR);
+                    month = c.get(Calendar.MONTH);
+                    day = c.get(Calendar.DAY_OF_MONTH);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+            }
 
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
             endDate.setText(day + "/" + (month + 1) + "/" + year);
             try {
                 finishDate = sdf.parse(endDate.getText().toString());

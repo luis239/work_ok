@@ -10,6 +10,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,11 +22,8 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,11 +31,9 @@ import android.widget.Toast;
 import com.immagine.workok.Constants;
 import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
-import com.immagine.workok.adapter.UserProjectAdapter;
 import com.immagine.workok.model.Task;
 import com.immagine.workok.model.User;
 
-import org.afree.data.time.Year;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -68,7 +65,6 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
     private int status_id = 3;
     private Task task;
     private static int isEdit = 0;
-    private RadioGroup radioGroup;
     private ArrayList<User> items = new ArrayList<>();
     private int userIdSelected = 0;
     private Spinner spinner;
@@ -78,6 +74,8 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
     static Date initDate = new Date(),finishDate = new Date();
     private LinearLayout container;
     ArrayAdapter<User> adapter;
+    private boolean isOwner;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,13 +87,18 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
         nameTask = (EditText)findViewById(R.id.projectName);
         description = (EditText)findViewById(R.id.observaciones);
         percent = (EditText)findViewById(R.id.percent);
-        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+        //percent.setText("0");
+
+
         inProgress = (RadioButton)findViewById(R.id.radioButton);
         inProgress.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (inProgress.isChecked())
+                if (inProgress.isChecked()) {
                     status_id = 3;
+                    percent.setClickable(true);
+                    percent.setFocusableInTouchMode(true);
+                }
             }
         });
 
@@ -103,16 +106,24 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
         rejected.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (rejected.isChecked())
+                if (rejected.isChecked()) {
                     status_id = 4;
+                    percent.setText("0");
+                    percent.setClickable(false);
+                    percent.setFocusableInTouchMode(false);
+                }
             }
         });
         done = (RadioButton)findViewById(R.id.radioButton3);
         done.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (done.isChecked())
+                if (done.isChecked()) {
                     status_id = 5;
+                    percent.setText("100");
+                    percent.setClickable(false);
+                    percent.setFocusableInTouchMode(false);
+                }
             }
         });
 
@@ -141,7 +152,7 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
                 verifyData();
             }
         });
-
+        spinner = (Spinner) findViewById(R.id.spinner_users);
         final Bundle bundle = getIntent().getExtras();
         isEdit = bundle.getInt("edit");
         projectId = bundle.getInt("ID");
@@ -167,6 +178,18 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
             setTitle("Actualizar Tarea");
             initializeDates();
         }
+        if (isOwner){
+
+            startDate.setClickable(false);
+            startDate.setFocusableInTouchMode(false);
+            endDate.setClickable(false);
+            endDate.setFocusableInTouchMode(false);
+            nameTask.setClickable(false);
+            nameTask.setFocusableInTouchMode(false);
+            spinner.setClickable(false);
+            spinner.setFocusableInTouchMode(false);
+
+        }
 
         label = (TextView)findViewById(R.id.no_assigned);
         label.setOnClickListener(new View.OnClickListener() {
@@ -180,7 +203,26 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
 
             }
         });
-        spinner = (Spinner) findViewById(R.id.spinner_users);
+        percent.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.equals("100")) {
+                    done.setChecked(true);
+                    inProgress.setChecked(false);
+                }
+            }
+        });
+
         spinner.setOnItemSelectedListener(this);
 
     }
