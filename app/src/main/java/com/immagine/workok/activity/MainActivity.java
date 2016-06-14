@@ -166,8 +166,8 @@ public class MainActivity extends AppCompatActivity
         }
         else if (id == R.id.gantter) {
 
-            /*Intent intent = new Intent(MainActivity.this,GantterActivity.class);
-            startActivity(intent);*/
+            Intent intent = new Intent(MainActivity.this,GantterActivity.class);
+            startActivity(intent);
 
         }else if (id == R.id.nav_manage) {
 
