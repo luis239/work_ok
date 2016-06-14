@@ -74,7 +74,7 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
     static Date initDate = new Date(),finishDate = new Date();
     private LinearLayout container;
     ArrayAdapter<User> adapter;
-    private boolean isOwner;
+    private boolean isOwner = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +83,7 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
+        boolean comeFrom = false;
         container = (LinearLayout) findViewById(R.id.container_dates) ;
         nameTask = (EditText)findViewById(R.id.projectName);
         description = (EditText)findViewById(R.id.observaciones);
@@ -159,7 +160,11 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
         if(isEdit == 1) {
             Intent intent = getIntent();
             task = (Task) intent.getSerializableExtra("task");
+            comeFrom = intent.getBooleanExtra("come_from_details",false);
+            if(task.getOwnerId() == User.user.getUser_id() || comeFrom)
+                isOwner = true;
             nameTask.setText(task.getTitle());
+            projectId = task.getProject_id();
             status_id = task.getStatus_id();
             if(status_id==3) {
                 inProgress.setChecked(true);
@@ -178,16 +183,22 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
             setTitle("Actualizar Tarea");
             initializeDates();
         }
-        if (isOwner){
+        if (!isOwner){
 
             startDate.setClickable(false);
             startDate.setFocusableInTouchMode(false);
+            startDate.setEnabled(false);
             endDate.setClickable(false);
             endDate.setFocusableInTouchMode(false);
+            endDate.setEnabled(false);
             nameTask.setClickable(false);
             nameTask.setFocusableInTouchMode(false);
+            nameTask.setEnabled(false);
             spinner.setClickable(false);
             spinner.setFocusableInTouchMode(false);
+            description.setClickable(false);
+            description.setFocusableInTouchMode(false);
+            description.setEnabled(false);
 
         }
 

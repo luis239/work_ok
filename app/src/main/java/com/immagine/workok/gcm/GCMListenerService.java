@@ -1,5 +1,6 @@
 package com.immagine.workok.gcm;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -56,15 +57,18 @@ public class GCMListenerService extends GcmListenerService {
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_logo_notification)
                 .setContentTitle("Work Ok")
-                .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
+                .setContentIntent(pendingIntent)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message));
+
+
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
 
         int idNotificacion = 1;
         notificationManager.notify(1, notificationBuilder.build());

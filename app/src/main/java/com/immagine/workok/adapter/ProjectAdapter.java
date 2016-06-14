@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.immagine.workok.R;
@@ -24,27 +26,34 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onClick(ProjectViewHolder holder, int index);
+        void onClick(View v, int index);
     }
 
     public class ProjectViewHolder extends RecyclerView.ViewHolder implements  View.OnClickListener {
+        private final ImageView delete;
         public TextView percent;
         public ImageView imagen;
         public TextView nombre;
         public TextView visitas;
 
+        public RelativeLayout layout;
         public ProjectViewHolder(View v) {
             super(v);
-            //imagen = (ImageView) v.findViewById(R.id.imagen);
+            imagen = (ImageView) v.findViewById(R.id.imageButton);
+            delete = (ImageView) v.findViewById(R.id.delete);
             percent = (TextView) v.findViewById(R.id.percent);
             nombre = (TextView) v.findViewById(R.id.nombre);
             visitas = (TextView) v.findViewById(R.id.user_assigend);
-            v.setOnClickListener(this);
+            layout = (RelativeLayout) v.findViewById(R.id.card_view);
+            layout.setOnClickListener(this);
+            imagen.setOnClickListener(this);
+            delete.setOnClickListener(this);
+
         }
 
         @Override
         public void onClick(View v) {
-            listener.onClick(this,getAdapterPosition());
+            listener.onClick(v,getAdapterPosition());
         }
     }
 

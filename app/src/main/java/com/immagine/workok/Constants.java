@@ -28,4 +28,5 @@ public class Constants {
     public static final int ACTION_LIST_TASK = 10;
     public static final int ACTION_DELETE_USER_FROM_PROJECT = 9;
 
+    public static final int ACTION_DELETE_PROJECT = 4;
 }

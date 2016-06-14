@@ -50,6 +50,7 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
     private FloatingActionButton editProyect;
     private  TaskListTask mTask = null;
     private Project project;
+    private TextView message;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +66,7 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
         title.setText(project.getTitle());
         recycler = (RecyclerView) findViewById(R.id.reciclador);
         //recycler.setHasFixedSize(true);
-
+        message = (TextView) findViewById(R.id.message);
         // Usar un administrador para LinearLayout
         lManager = new LinearLayoutManager(act);
         recycler.setLayoutManager(lManager);
@@ -147,6 +148,7 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
         Task task = items.get(index);
         Intent intent = new Intent(this,NewTaskActivity.class);
         intent.putExtra("task",task);
+        intent.putExtra("come_from_details",true);
         Bundle bundle = new Bundle();
         bundle.putInt("edit",1);
         bundle.putInt("ID",project.getProject_id());
@@ -253,7 +255,8 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
         protected void onPostExecute(final Boolean success) {
             mTask = null;
             if (success) {
-
+                if(!items.isEmpty())
+                    message.setVisibility(View.GONE);
                 adapter = new TaskProjectAdapter(items,ProyectDetailsActivity.this);
                 recycler.setAdapter(adapter);
 

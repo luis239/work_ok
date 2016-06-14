@@ -62,6 +62,8 @@
     <string name="graph_gantt">Graficar Gantter</string>
     <string name="message_no_task">No tiene ninguna Tarea asociada</string>
     <string name="no_user_assigned">No posee usuarios Asignados, Click aqui para asignar</string>
+    <string name="message_new_task">Presione el símbolo + para crear nuevas tareas</string>
+    <string name="message_no_users">Ingrese Usuarios a sus proyecto</string>
 
 
 </resources>

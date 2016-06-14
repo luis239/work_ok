@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.immagine.workok.Constants;
 import com.immagine.workok.PreferencesUtil;
@@ -46,6 +47,7 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
     private UserListInProjectTask mTask = null;
     private int projectId = 0;
     private DeletUserProjectTask dTask = null;
+    private TextView message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,7 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
 
         Bundle bundle = getIntent().getExtras();
         projectId = bundle.getInt("ID_PROJECT");
+        message = (TextView) findViewById(R.id.message);
         addButton = (Button) findViewById(R.id.addUser);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -256,11 +259,13 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
 
             //showProgress(false);
             if (success) {
-
+                if(!items.isEmpty())
+                    message.setVisibility(View.GONE);
                 adapter = new UserProjectAdapter(items,AddUserProject.this);
                 recycler.setAdapter(adapter);
 
             }
+
             progressDialog.dismiss();
         }
 

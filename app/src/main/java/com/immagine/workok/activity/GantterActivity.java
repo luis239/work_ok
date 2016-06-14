@@ -28,6 +28,7 @@ import org.json.JSONObject;
 import lecho.lib.hellocharts.listener.ColumnChartOnValueSelectListener;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.MediaScannerConnection;
@@ -50,6 +51,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.immagine.workok.R;
+import com.immagine.workok.model.Project;
 import com.immagine.workok.model.Task;
 
 import lecho.lib.hellocharts.model.ColumnChartData;
@@ -64,7 +66,7 @@ public class GantterActivity extends AppCompatActivity {
 
     Button b_generar_gantt;
     Button b_guardar_gantt;
-    String project_id = "1";
+    int project_id;
     CategoryDataset dataset;
     //TaskSeries tasks;
     AFreeChart chart;
@@ -81,6 +83,8 @@ public class GantterActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(p);
         gantt = (WebView)findViewById(R.id.gantt);
 
+        Intent intent = getIntent();
+        project_id = intent.getIntExtra("project_id",0);
         //grafico_gantt.destroyDrawingCache();
         //grafico_gantt.setDrawingCacheEnabled(true);
 

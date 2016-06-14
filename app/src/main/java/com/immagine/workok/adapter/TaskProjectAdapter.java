@@ -35,9 +35,11 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
         public TextView name;
         public TextView userAssigned;
         public TextView percent;
+        public ImageView delete;
 
         public TaskViewHolder(View v) {
             super(v);
+            delete = (ImageView) v.findViewById(R.id.delete);
             imageButton = (ImageView) v.findViewById(R.id.imageButton);
             name = (TextView) v.findViewById(R.id.nombre);
             userAssigned = (TextView) v.findViewById(R.id.user_assigend);
@@ -77,8 +79,10 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
 
         holder.name.setText(items.get(position).getTitle());
         holder.percent.setText("Completado: "+items.get(position).getPercentage()+"%");
+        holder.delete.setVisibility(View.GONE);
         if(items.get(position).getFullname() != null)
             holder.userAssigned.setText("Asignado a: " + items.get(position).getFullname());
+
     }
 
     @Override

@@ -140,4 +140,11 @@ public class Task implements Serializable {
         this.fullname = fullname;
     }
 
+    public int getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(int ownerId) {
+        this.ownerId = ownerId;
+    }
 }

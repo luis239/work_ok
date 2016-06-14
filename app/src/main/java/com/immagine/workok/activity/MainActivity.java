@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.immagine.workok.Constants;
 import com.immagine.workok.PreferencesUtil;
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     private TextView message;
     private ProjectListTask mTask = null;
     private List<Project> items = new ArrayList<>();
+    private DeleteProjectTask dTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,13 +188,29 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onClick(ProjectAdapter.ProjectViewHolder holder, int index) {
 
-        Project project = items.get(index);
-        Intent intent = new Intent(this,ProyectDetailsActivity.class);
-        intent.putExtra("project",project);
-        startActivity(intent);
+
+    @Override
+    public void onClick(View view, int index) {
+        Intent intent;
+        if (view.getId() ==R.id.imageButton) {
+            int projectId = items.get(index).getProject_id();
+            intent = new Intent(this, GantterActivity.class);
+            intent.putExtra("project_id", projectId);
+            startActivity(intent);
+        }
+        if(view.getId() == R.id.delete) {
+            dTask = new DeleteProjectTask(MainActivity.this,items.get(index).getProject_id(),index);
+            dTask.execute((Void) null);
+
+        }
+        if(view.getId() ==R.id.card_view) {
+            Project project = items.get(index);
+            intent = new Intent(this, ProyectDetailsActivity.class);
+            intent.putExtra("project", project);
+            startActivity(intent);
+        }
+
     }
 
 
@@ -306,6 +325,117 @@ public class MainActivity extends AppCompatActivity
             }else{
 
 
+            }
+            progressDialog.dismiss();
+        }
+
+        @Override
+        protected void onCancelled() {
+            mTask = null;
+            //showProgress(false);
+        }
+    }
+
+    public class DeleteProjectTask extends AsyncTask<Void, Void, Boolean> {
+
+
+        int projectId,index;
+        ProgressDialog progressDialog;
+        DeleteProjectTask(Activity activity,int projectId,int index) {
+
+            this.projectId = projectId;
+            this.index = index;
+            progressDialog = new ProgressDialog(activity,R.style.AppTheme_Dark_Dialog);
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Espere...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+
+
+
+            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
+            String dataUrlParameters = "project_id="+projectId+"action="+ Constants.ACTION_DELETE_PROJECT;
+            URL url;
+            HttpURLConnection connection = null;
+            try {
+                // Create connection
+                url = new URL(dataUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Length","" + Integer.toString(dataUrlParameters.getBytes().length));
+                connection.setRequestProperty("Content-Language", "en-US");
+                connection.setUseCaches(false);
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                // Send request
+                DataOutputStream wr = new DataOutputStream(
+                        connection.getOutputStream());
+                wr.writeBytes(dataUrlParameters);
+                wr.flush();
+                wr.close();
+                // Get Response
+                InputStream is = connection.getInputStream();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                String line;
+                StringBuffer response = new StringBuffer();
+
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
+
+                String responseStr = response.toString();
+                JSONObject jsonObj = new JSONObject(responseStr);
+                if(jsonObj.getString("success").equals("1")){
+                    Log.d("Server response",responseStr);
+                    return true;
+                }else{
+
+
+                    return false;
+                }
+
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return false;
+
+            } finally {
+
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+
+        }
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mTask = null;
+
+            //showProgress(false);
+            if (success) {
+
+                recycler.setAdapter(adapter);
+                items.remove(index);
+                adapter.notifyItemRemoved(index);
+                Toast.makeText(MainActivity.this,"Proyecto Eliminado satisfactoriamente",Toast.LENGTH_LONG);
+
+
+            }else{
+
+                Toast.makeText(MainActivity.this,"Error Eliminando el Proyecto",Toast.LENGTH_LONG);
             }
             progressDialog.dismiss();
         }
