@@ -85,12 +85,6 @@ public class GantterActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         project_id = intent.getIntExtra("project_id",0);
-        //grafico_gantt.destroyDrawingCache();
-        //grafico_gantt.setDrawingCacheEnabled(true);
-
-
-
-
 
                 try{
 
@@ -143,7 +137,7 @@ public class GantterActivity extends AppCompatActivity {
         gantt.setDrawingCacheEnabled(true);
         gantt.buildDrawingCache(true);
         File root = new File(String.valueOf(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)));
-        File myDir = new File(root, "Gantt");
+        File myDir = new File(root, "Work OK");
         myDir.mkdirs();
         String fname = "diagram.png";
         File file = new File (myDir, fname);

@@ -1,6 +1,7 @@
 package com.immagine.workok.activity;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -31,6 +32,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.immagine.workok.Constants;
 import com.immagine.workok.R;
@@ -41,8 +43,10 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -261,6 +265,8 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
 
     private boolean isEmailValid(String email) {
 
+        if(email.contains("ñ"))
+            return false;
         if (email.contains("@") && email.contains("."))
             return true;
         return false;
@@ -282,25 +288,10 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final String name, final String email, final String password) {
 
-        final ProgressDialog progressDialog = new ProgressDialog(SignUpActivity.this,
-                R.style.AppTheme_Dark_Dialog);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Registrando...");
-        progressDialog.show();
-
-
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
                         // On complete call either onLoginSuccess or onLoginFailed
                         //onLoginSuccess();
-                        mAuthTask = new SignUpTask(name,email, password);
+                        mAuthTask = new SignUpTask(name,email, password,this);
                         mAuthTask.execute((Void) null);
-                        progressDialog.dismiss();
-                        // onLoginFailed();
-
-                    }
-                }, 3000);
 
     }
 
@@ -367,17 +358,31 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         private final String mEmail;
         private final String mPassword;
         private final String mName;
+        ProgressDialog mProgressDialog;
 
-        SignUpTask(String name,String email, String password) {
+        SignUpTask(String name,String email, String password, Activity a) {
             mEmail = email;
             mPassword = password;
             mName = name;
+            mProgressDialog = new ProgressDialog(a,R.style.AppTheme_Dark_Dialog);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mProgressDialog.setMessage("Registrando...");
+            mProgressDialog.show();
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             String dataUrl = "http://www.jexsantofagasta.cl/workok/wouser.php";
-            String dataUrlParameters = "username="+mEmail+"&fullname="+mName+"&password="+mPassword+"&action="+ Constants.ACTION_CREATE;
+            String name = null;
+            try {
+                name =  URLEncoder.encode(mName, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            String dataUrlParameters = "username="+mEmail+"&fullname="+name+"&password="+mPassword+"&action="+ Constants.ACTION_CREATE;
             URL url;
             HttpURLConnection connection = null;
             try {
@@ -443,18 +448,23 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
 
         @Override
         protected void onPostExecute(final Boolean success) {
-
+            mProgressDialog.dismiss();
             if (success) {
-
+                    Toast.makeText(SignUpActivity.this,"Registro Satisfactorio",Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(SignUpActivity.this,LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
+                    finish();
 
 
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+
+                Snackbar.make(mLoginFormView, R.string.error_sign_up, Snackbar.LENGTH_INDEFINITE)
+                        .setAction("action",null);
             }
+
+
+
         }
 
         @Override

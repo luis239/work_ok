@@ -1,8 +1,10 @@
 package com.immagine.workok.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -109,10 +111,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        getProjects(User.user.getUser_id());
         PreferencesUtil preference = new PreferencesUtil(this);
         User.user.setUser_id(preference.getUserId());
         User.user.setFullname(preference.getUserName());
+        getProjects(User.user.getUser_id());
+
     }
 
     private void getProjects(final int user_id) {
@@ -161,24 +164,20 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_task) {
 
             Intent intent = new Intent(MainActivity.this,MyTasksActivity.class);
             startActivity(intent);
 
         }
-        else if (id == R.id.gantter) {
+        else if (id == R.id.notifications) {
 
             Intent intent = new Intent(MainActivity.this,GantterActivity.class);
             startActivity(intent);
 
-        }else if (id == R.id.nav_manage) {
-
-            Intent intent = new Intent(MainActivity.this,GantterActivity.class);
+        }else if (id == R.id.nav_logout) {
+            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
             startActivity(intent);
-
-        } else if (id == R.id.nav_send) {
-
             finish();
 
         }
@@ -191,7 +190,7 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    public void onClick(View view, int index) {
+    public void onClick(View view, final int index) {
         Intent intent;
         if (view.getId() ==R.id.imageButton) {
             int projectId = items.get(index).getProject_id();
@@ -200,8 +199,23 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
         }
         if(view.getId() == R.id.delete) {
-            dTask = new DeleteProjectTask(MainActivity.this,items.get(index).getProject_id(),index);
-            dTask.execute((Void) null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("¿Desea eliminar este Proyecto?");
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dTask = new DeleteProjectTask(MainActivity.this,items.get(index).getProject_id(),index);
+                    dTask.execute((Void) null);
+                }
+            });
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User cancelled the dialog
+                }
+            });
+
+            AlertDialog dialog = builder.show();
+            dialog.setCanceledOnTouchOutside(true);
+
 
         }
         if(view.getId() ==R.id.card_view) {
@@ -324,6 +338,8 @@ public class MainActivity extends AppCompatActivity
 
             }else{
 
+                if (!items.isEmpty())
+                    message.setVisibility(View.VISIBLE);
 
             }
             progressDialog.dismiss();
@@ -358,12 +374,8 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-
-
-            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
-            String dataUrlParameters = "project_id="+projectId+"action="+ Constants.ACTION_DELETE_PROJECT;
+             String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
+            String dataUrlParameters = "project_id="+projectId+"&action="+ Constants.ACTION_DELETE_PROJECT;
             URL url;
             HttpURLConnection connection = null;
             try {
@@ -427,15 +439,18 @@ public class MainActivity extends AppCompatActivity
             //showProgress(false);
             if (success) {
 
+
                 recycler.setAdapter(adapter);
                 items.remove(index);
                 adapter.notifyItemRemoved(index);
-                Toast.makeText(MainActivity.this,"Proyecto Eliminado satisfactoriamente",Toast.LENGTH_LONG);
+                if(items.isEmpty())
+                    message.setVisibility(View.VISIBLE);
+                Toast.makeText(MainActivity.this,"Proyecto Eliminado satisfactoriamente",Toast.LENGTH_LONG).show();
 
 
             }else{
 
-                Toast.makeText(MainActivity.this,"Error Eliminando el Proyecto",Toast.LENGTH_LONG);
+                Toast.makeText(MainActivity.this,"Error Eliminando el Proyecto",Toast.LENGTH_LONG).show();
             }
             progressDialog.dismiss();
         }

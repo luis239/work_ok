@@ -134,7 +134,7 @@ public class AddUserProject extends AppCompatActivity implements UserProjectAdap
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 // Add the buttons
-        builder.setMessage("Desea eliminar este usuario?");
+        builder.setMessage("¿Desea eliminar este usuario?");
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dTask = new DeletUserProjectTask(AddUserProject.this,items.get(index).getUser_id(),index);

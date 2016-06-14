@@ -64,6 +64,7 @@
     <string name="no_user_assigned">No posee usuarios Asignados, Click aqui para asignar</string>
     <string name="message_new_task">Presione el símbolo + para crear nuevas tareas</string>
     <string name="message_no_users">Ingrese Usuarios a sus proyecto</string>
+    <string name="error_sign_up">Error al registrar el usuario</string>
 
 
 </resources>

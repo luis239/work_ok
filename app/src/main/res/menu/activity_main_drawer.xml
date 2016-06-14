@@ -3,20 +3,16 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/nav_task"
             android:icon="@drawable/ic_account_multiple_black_36dp"
             android:title="Mis Tareas" />
         <item
-            android:id="@+id/gantter"
-            android:icon="@drawable/ic_details_36"
-            android:title="Gantter" />
+            android:id="@+id/notifications"
+            android:icon="@drawable/ic_bell_black_18dp"
+            android:title="Notificaciones" />
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Herramientas" />
-        <item
-            android:id="@+id/nav_send"
-            android:icon="@drawable/ic_logout_grey600_48dp"
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_logout_black_18dp"
             android:title="@string/exit" />
     </group>
 

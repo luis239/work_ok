@@ -1,7 +1,9 @@
 package com.immagine.workok.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +14,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
@@ -48,7 +51,8 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
     private FloatingActionButton addTask;
     private FloatingActionButton addUser;
     private FloatingActionButton editProyect;
-    private  TaskListTask mTask = null;
+    private TaskListTask mTask = null;
+    private DeleteTask dTask = null;
     private Project project;
     private TextView message;
     @Override
@@ -116,10 +120,11 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
     @Override
     protected void onResume() {
         super.onResume();
-        getTasksListTask(project.getProject_id());
         PreferencesUtil preference = new PreferencesUtil(this);
         User.user.setUser_id(preference.getUserId());
         User.user.setFullname(preference.getUserName());
+        getTasksListTask(project.getProject_id());
+
     }
 
     private void getTasksListTask(final int project_id) {
@@ -144,16 +149,49 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
     }
 
     @Override
-    public void onClick(TaskProjectAdapter.TaskViewHolder holder, int index) {
-        Task task = items.get(index);
-        Intent intent = new Intent(this,NewTaskActivity.class);
-        intent.putExtra("task",task);
-        intent.putExtra("come_from_details",true);
-        Bundle bundle = new Bundle();
-        bundle.putInt("edit",1);
-        bundle.putInt("ID",project.getProject_id());
-        intent.putExtras(bundle);
-        startActivity(intent);
+    public void onClick(View view, final int pos) {
+
+
+        Intent intent;
+        if (view.getId() ==R.id.imageButton) {
+            int projectId = items.get(pos).getProject_id();
+            intent = new Intent(this, GantterActivity.class);
+            intent.putExtra("project_id", projectId);
+            startActivity(intent);
+        }
+        if(view.getId() == R.id.delete) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("¿Desea eliminar esta Tarea?");
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dTask = new DeleteTask(ProyectDetailsActivity.this,items.get(pos).getTask_id(),pos);
+                    dTask.execute((Void) null);
+                }
+            });
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User cancelled the dialog
+                }
+            });
+
+            AlertDialog dialog = builder.show();
+            dialog.setCanceledOnTouchOutside(true);
+
+
+        }
+        if(view.getId() ==R.id.card_view) {
+            Task task = items.get(pos);
+            intent = new Intent(this,NewTaskActivity.class);
+            intent.putExtra("task",task);
+            intent.putExtra("come_from_details",true);
+            Bundle bundle = new Bundle();
+            bundle.putInt("edit",1);
+            bundle.putInt("ID",project.getProject_id());
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
+
+
 
 
     }
@@ -262,7 +300,118 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
 
             }else{
 
+                /*if(items.isEmpty())
+                    message.setVisibility(View.VISIBLE);*/
+            }
+            progressDialog.dismiss();
+        }
 
+        @Override
+        protected void onCancelled() {
+            mTask = null;
+            //showProgress(false);
+        }
+    }
+
+    public class DeleteTask extends AsyncTask<Void, Void, Boolean> {
+
+
+        int taskId,index;
+        ProgressDialog progressDialog;
+        DeleteTask(Activity activity,int taskId,int index) {
+
+            this.taskId = taskId;
+            this.index = index;
+            progressDialog = new ProgressDialog(activity,R.style.AppTheme_Dark_Dialog);
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Espere...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            String dataUrl = "http://www.jexsantofagasta.cl/workok/wotask.php";
+            String dataUrlParameters = "task_id="+taskId+"&action="+ Constants.ACTION_DELETE;
+            URL url;
+            HttpURLConnection connection = null;
+            try {
+                // Create connection
+                url = new URL(dataUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Length","" + Integer.toString(dataUrlParameters.getBytes().length));
+                connection.setRequestProperty("Content-Language", "en-US");
+                connection.setUseCaches(false);
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                // Send request
+                DataOutputStream wr = new DataOutputStream(
+                        connection.getOutputStream());
+                wr.writeBytes(dataUrlParameters);
+                wr.flush();
+                wr.close();
+                // Get Response
+                InputStream is = connection.getInputStream();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                String line;
+                StringBuffer response = new StringBuffer();
+
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
+
+                String responseStr = response.toString();
+                JSONObject jsonObj = new JSONObject(responseStr);
+                if(jsonObj.getString("success").equals("1")){
+                    Log.d("Server response",responseStr);
+                    return true;
+                }else{
+
+
+                    return false;
+                }
+
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return false;
+
+            } finally {
+
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+
+        }
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mTask = null;
+
+            //showProgress(false);
+            if (success) {
+
+
+                recycler.setAdapter(adapter);
+                items.remove(index);
+                adapter.notifyItemRemoved(index);
+                if(items.isEmpty())
+                    message.setVisibility(View.VISIBLE);
+                Toast.makeText(ProyectDetailsActivity.this,"Tarea Eliminada satisfactoriamente",Toast.LENGTH_LONG).show();
+
+
+            }else{
+
+                Toast.makeText(ProyectDetailsActivity.this,"Error Eliminando la tarea",Toast.LENGTH_LONG).show();
             }
             progressDialog.dismiss();
         }

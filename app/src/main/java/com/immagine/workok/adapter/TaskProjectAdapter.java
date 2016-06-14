@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.immagine.workok.R;
@@ -26,7 +27,7 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onClick(TaskViewHolder holder, int index);
+        void onClick(View v, int index);
     }
 
     public class TaskViewHolder extends RecyclerView.ViewHolder implements  View.OnClickListener {
@@ -36,6 +37,7 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
         public TextView userAssigned;
         public TextView percent;
         public ImageView delete;
+        public RelativeLayout layout;
 
         public TaskViewHolder(View v) {
             super(v);
@@ -45,12 +47,15 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
             userAssigned = (TextView) v.findViewById(R.id.user_assigend);
             percent = (TextView) v.findViewById(R.id.percent);
             imageButton.setImageResource(android.R.drawable.ic_menu_edit);
-            v.setOnClickListener(this);
+            layout = (RelativeLayout) v.findViewById(R.id.card_view);
+            layout.setOnClickListener(this);
+            delete.setOnClickListener(this);
+
         }
 
         @Override
         public void onClick(View v) {
-            listener.onClick(this,getAdapterPosition());
+            listener.onClick(v,getAdapterPosition());
         }
     }
 
@@ -79,7 +84,6 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
 
         holder.name.setText(items.get(position).getTitle());
         holder.percent.setText("Completado: "+items.get(position).getPercentage()+"%");
-        holder.delete.setVisibility(View.GONE);
         if(items.get(position).getFullname() != null)
             holder.userAssigned.setText("Asignado a: " + items.get(position).getFullname());
 

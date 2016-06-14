@@ -97,6 +97,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkPlayServices();
                 attemptLogin();
             }
         });
@@ -223,12 +224,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 //        }
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
             showProgress(email,password);
 
 
@@ -344,6 +341,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
                 connection.setRequestProperty("Content-Length","" + Integer.toString(dataUrlParameters.getBytes().length));
                 connection.setRequestProperty("Content-Language", "en-US");
+                connection.setReadTimeout(30000);
+                connection.setConnectTimeout(35000);
                 connection.setUseCaches(false);
                 connection.setDoInput(true);
                 connection.setDoOutput(true);
@@ -368,10 +367,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 String responseStr = response.toString();
                 JSONObject jsonObj = new JSONObject(responseStr);
                 if(jsonObj.getString("success").equals("1")){
-                    JSONArray dataArray = new JSONArray();
-                    dataArray = jsonObj.getJSONArray("data");
-                    JSONObject data = new JSONObject();
-                    data = dataArray.getJSONObject(0);
+                    JSONArray dataArray = jsonObj.getJSONArray("data");
+                    JSONObject data = dataArray.getJSONObject(0);
 
                     user.setFullname(data.getString("fullname"));
                     user.setUser_id(data.getInt("user_id"));
@@ -387,6 +384,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             } catch (Exception e) {
 
                 e.printStackTrace();
+                Toast.makeText(LoginActivity.this,"Error con la Conexión",Toast.LENGTH_LONG);
                 return false;
 
             } finally {
@@ -459,7 +457,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 googleApiAvailability.getErrorDialog(this, resultCode,
                         PLAY_SERVICES_RESOLUTION_REQUEST).show();
             } else {
-                Log.i(SignUpActivity.class.getSimpleName(), "This device is not supported.");
+                Toast.makeText(LoginActivity.this,"Dispositivo no Soportado se necesita Play Services",Toast.LENGTH_LONG);
                 finish();
             }
             return false;
@@ -475,30 +473,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         startActivity(intent);
         finish();
     }
-
-
-
-
-
-        /*int codigoEstado = connection.getResponseCode();
-        if(codigoEstado != 200)
-            throw new Exception("Error al procesar registro. Estado Http: " + codigoEstado);
-
-        InputStream inputStream = connection.getInputStream();
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"UTF-8"));
-
-        String respuesta = "",linea;
-        while ((linea = bufferedReader.readLine()) != null) {
-            respuesta = respuesta + linea;
-        }
-
-        bufferedReader.close();
-        inputStream.close();
-
-        respuesta = new JSONObject(respuesta).getString("RegistroGcmResult");
-
-        if(!respuesta.equals("OK"))
-            throw new Exception("Error al registrarse en aplicacion servidor: " + respuesta);*/
 
 
 
@@ -520,12 +494,30 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Boolean doInBackground(String ... params) {
 
             try {
-
+                boolean respuesta = false;
                 publishProgress("Obteniendo Registration Token en GCM Servers...");
                 String registrationToken = GCMUtil.ObtenerRegistrationTokenEnGcm(getApplicationContext());
 
-                publishProgress("Enviando Registration a mi aplicacion servidor...");
-                boolean respuesta = GCMUtil.RegistrarseEnAplicacionServidor(getApplicationContext(),registrationToken);
+                if(preference.getTokenUser() != 0 && !preference.getToken().equals("")) {
+                    if (!registrationToken.equals(preference.getToken()) || User.user.getUser_id()!= preference.getTokenUser()) {
+
+                        respuesta = GCMUtil.UpdateRegisterServer(getApplicationContext(), registrationToken, preference.getTokenUser());
+                        if (respuesta) {
+
+                            preference.setToken(registrationToken);
+                            preference.setTokenUser(User.user.getUser_id());
+                        }
+                        return respuesta;
+                    }
+                    return  true;
+                }
+                publishProgress("Enviando Registration al Servidor...");
+                respuesta = GCMUtil.RegistrarseEnAplicacionServidor(getApplicationContext(), registrationToken);
+                if(respuesta){
+
+                    preference.setToken(registrationToken);
+                    preference.setTokenUser(User.user.getUser_id());
+                }
                 return respuesta;
             }
             catch (Exception ex){
@@ -548,7 +540,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 toMainActivity();
             }else{
 
-                Toast.makeText(getApplicationContext(),"Error GCM",Toast.LENGTH_LONG);
+                Toast.makeText(getApplicationContext(),"Error GCM",Toast.LENGTH_LONG).show();
             }
 
         }

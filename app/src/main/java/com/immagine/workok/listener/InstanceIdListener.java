@@ -29,10 +29,10 @@ public class InstanceIdListener extends InstanceIDListenerService {
 
             try {
 
-                publishProgress("Obteniendo Registration Token en GCM Servers...");
+                publishProgress("Obteniendo Token en GCM Servers...");
                 String registrationToken = GCMUtil.ObtenerRegistrationTokenEnGcm(getApplicationContext());
 
-                publishProgress("Enviando Registration a mi aplicacion servidor...");
+                publishProgress("Enviando Registro...");
                 Boolean respuesta = GCMUtil.RegistrarseEnAplicacionServidor(getApplicationContext(),registrationToken);
                 return respuesta;
             }

@@ -38,6 +38,29 @@ public class PreferencesUtil {
         return sharedPreferences.getString("name", "");
     }
 
+    public void setToken(String token){
 
+        SharedPreferences sharedPreferences = context.getSharedPreferences(WORK_OK_PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("token", token);
+        editor.commit();
+    }
 
+    public String getToken(){
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences(WORK_OK_PREFERENCES, Context.MODE_PRIVATE);
+        return sharedPreferences.getString("token", "");
+    }
+
+    public void setTokenUser(int id){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(WORK_OK_PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("UserTokenID", id);
+        editor.commit();
+    }
+
+    public int getTokenUser() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(WORK_OK_PREFERENCES, Context.MODE_PRIVATE);
+        return sharedPreferences.getInt("UserTokenID", 0);
+    }
 }

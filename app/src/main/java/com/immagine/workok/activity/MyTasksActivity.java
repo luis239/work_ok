@@ -63,10 +63,11 @@ public class MyTasksActivity extends AppCompatActivity implements TaskProjectAda
     @Override
     protected void onResume() {
         super.onResume();
-        getTasks(User.user.getUser_id());
         PreferencesUtil preference = new PreferencesUtil(this);
         User.user.setUser_id(preference.getUserId());
         User.user.setFullname(preference.getUserName());
+        getTasks(User.user.getUser_id());
+
     }
 
     private void getTasks(final int user_id) {
@@ -90,7 +91,7 @@ public class MyTasksActivity extends AppCompatActivity implements TaskProjectAda
 
 
     @Override
-    public void onClick(TaskProjectAdapter.TaskViewHolder holder, int index) {
+    public void onClick(View view, int index) {
 
         Task task = items.get(index);
         Intent intent = new Intent(this,NewTaskActivity.class);

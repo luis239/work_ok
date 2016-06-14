@@ -74,7 +74,7 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
     static Date initDate = new Date(),finishDate = new Date();
     private LinearLayout container;
     ArrayAdapter<User> adapter;
-    private boolean isOwner = false;
+    private boolean isOwner = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,8 +161,8 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
             Intent intent = getIntent();
             task = (Task) intent.getSerializableExtra("task");
             comeFrom = intent.getBooleanExtra("come_from_details",false);
-            if(task.getOwnerId() == User.user.getUser_id() || comeFrom)
-                isOwner = true;
+            if(task.getOwnerId() != User.user.getUser_id() && !comeFrom)
+                isOwner = false;
             nameTask.setText(task.getTitle());
             projectId = task.getProject_id();
             status_id = task.getStatus_id();

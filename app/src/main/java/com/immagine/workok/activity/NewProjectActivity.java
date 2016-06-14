@@ -208,7 +208,7 @@ public class NewProjectActivity extends AppCompatActivity {
             // form field with an error.
             focusView.requestFocus();
         } else if (isEdit == 0) {
-            mTask = new CreateProjectTask(name, desc, startDate.getText().toString(), endDate.getText().toString(), User.user.getUser_id());
+            mTask = new CreateProjectTask(name, desc, startDate.getText().toString(), endDate.getText().toString(), User.user.getUser_id(),this);
             mTask.execute((Void) null);
         }else{
 
@@ -230,14 +230,23 @@ public class NewProjectActivity extends AppCompatActivity {
         String dateStart;
         String dateEnd;
         int userId;
-
-        public CreateProjectTask(String nameProject, String description, String dateStart, String dateEnd, int userId) {
+        ProgressDialog progressDialog;
+        public CreateProjectTask(String nameProject, String description, String dateStart, String dateEnd, int userId,Activity a) {
             this.nameProject = nameProject;
             this.description = description;
             this.dateStart = dateStart;
             this.dateEnd = dateEnd;
             this.userId = userId;
+            progressDialog = new ProgressDialog(a,R.style.AppTheme_Dark_Dialog);
         }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Cargando...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
 
         @Override
         protected Boolean doInBackground(Void... params) {
@@ -301,6 +310,7 @@ public class NewProjectActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
 
+            progressDialog.dismiss();
             if (success) {
                 if (success) {
 

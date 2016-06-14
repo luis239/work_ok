@@ -59,6 +59,7 @@ public class GCMListenerService extends GcmListenerService {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_logo_notification)
                 .setContentTitle("Work Ok")
+                .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent)
@@ -69,8 +70,6 @@ public class GCMListenerService extends GcmListenerService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-
-        int idNotificacion = 1;
         notificationManager.notify(1, notificationBuilder.build());
     }
 }
