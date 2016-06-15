@@ -44,7 +44,7 @@
                     android:id="@+id/name_user"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/name"
+                    android:hint="@string/fullname"
                     android:inputType="text"
                     android:maxLines="1"
                     android:singleLine="true"

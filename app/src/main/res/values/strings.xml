@@ -18,6 +18,7 @@
     </string>
     <string name="title_activity_sign_up">Sign Up</string>
     <string name="name">Nombre</string>
+    <string name="fullname">Nombre y Apellido</string>
     <string name="pass_confirm">Confirmar Contraseña</string>
     <string name="registrarse">Registrarse</string>
     <string name="acept_terms">Acepto Terminos y Condciones</string>
@@ -68,6 +69,7 @@
     <string name="no_messages">Usted no tiene nuevas notificaciones</string>
     <string name="notifications">Notificaciones</string>
     <string name="my_tasks">Mis Tareas</string>
+    <string name="search">Buscar</string>
 
 
 </resources>

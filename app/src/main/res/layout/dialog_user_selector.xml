@@ -10,8 +10,9 @@
         android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="350dp"
-        android:layout_below="@+id/dialog_title"
-        android:layout_alignParentStart="true">
+        android:layout_below="@+id/searchView"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="5dp">
 
     </android.support.v7.widget.RecyclerView>
 
@@ -22,8 +23,9 @@
         android:id="@+id/button2"
         android:background="@android:color/black"
         android:textColor="@color/abc_primary_text_material_dark"
-        android:layout_centerHorizontal="true"
+        android:layout_alignWithParentIfMissing="false"
         android:layout_below="@+id/recycler_view"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp" />
 
     <TextView
@@ -37,6 +39,17 @@
         android:textAlignment="center"
         android:textSize="18dp"
         android:textStyle="bold"
-        android:textColor="#ffffff" />
+        android:textColor="#ffffff"
+        android:layout_marginBottom="3dp" />
+
+    <SearchView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/searchView"
+        android:layout_below="@+id/dialog_title"
+        android:layout_centerHorizontal="true"
+        android:iconifiedByDefault="false"
+        android:queryHint="@string/search"
+        android:background="@drawable/border_search_bar" />
 
 </RelativeLayout>

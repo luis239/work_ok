@@ -6,21 +6,19 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.SearchView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-
 import com.immagine.workok.Constants;
 import com.immagine.workok.R;
 import com.immagine.workok.adapter.UserProjectAdapter;
-import com.immagine.workok.model.Project;
 import com.immagine.workok.model.User;
 
 import org.json.JSONArray;
@@ -34,7 +32,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -55,6 +52,7 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
     private UserListTask mTask = null;
     private UploadUserTask mTask2 = null;
     private int projectId;
+    private SearchView search;
 
     public UserSelectionDialog(Activity a,OnClickAddUser listener,int projectId) {
         super(a);
@@ -70,6 +68,7 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
 
         this.setTitle(R.string.select_add_user);
 
+        search = (SearchView) findViewById(R.id.searchView);
 
         recycler = (RecyclerView) findViewById(R.id.recycler_view);
         add = (Button) findViewById(R.id.button2);
@@ -83,9 +82,36 @@ public class UserSelectionDialog extends Dialog implements UserProjectAdapter.On
         // Crear un nuevo adaptador
         adapter = new UserProjectAdapter(items,true,this);
         recycler.setAdapter(adapter);
+        search.setOnQueryTextListener(listen);
 
         getUsersList();
     }
+
+    SearchView.OnQueryTextListener listen = new SearchView.OnQueryTextListener() {
+        @Override
+        public boolean onQueryTextChange(String query) {
+            query = query.toLowerCase();
+
+            final List<User> filteredList = new ArrayList<>();
+
+            for (int i = 0; i < items.size(); i++) {
+
+                final String text = items.get(i).getFullname().toLowerCase();
+                if (text.contains(query)) {
+
+                    filteredList.add(items.get(i));
+                }
+            }
+            adapter = new UserProjectAdapter(filteredList,true,UserSelectionDialog.this);
+            recycler.setAdapter(adapter);
+            adapter.notifyDataSetChanged();  // data set changed
+            return true;
+
+        }
+        public boolean onQueryTextSubmit(String query) {
+            return false;
+        }
+    };
 
 
     private void getUsersList() {

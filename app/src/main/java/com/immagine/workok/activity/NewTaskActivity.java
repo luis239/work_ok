@@ -198,9 +198,6 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
             nameTask.setEnabled(false);
             spinner.setClickable(false);
             spinner.setFocusableInTouchMode(false);
-            description.setClickable(false);
-            description.setFocusableInTouchMode(false);
-            description.setEnabled(false);
 
         }
 
