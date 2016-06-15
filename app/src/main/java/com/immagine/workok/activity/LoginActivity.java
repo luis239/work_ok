@@ -217,11 +217,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             focusView = mEmailView;
             cancel = true;
         }
-// else if (!isEmailValid(email)) {
-//            mEmailView.setError(getString(R.string.error_invalid_email));
-//            focusView = mEmailView;
-//            cancel = true;
-//        }
+        else if (!isEmailValid(email)) {
+                mEmailView.setError(getString(R.string.error_invalid_email));
+                focusView = mEmailView;
+                cancel = true;
+            }
 
         if (cancel) {
             focusView.requestFocus();
@@ -232,6 +232,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+    private boolean isEmailValid(String email) {
+
+        if (email == null) {
+            return false;
+        } else {
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+        }
+    }
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
@@ -487,6 +495,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected void onPreExecute() {
             mProgressDialog.setMessage("Registrando...");
+            mProgressDialog.setCancelable(false);
             mProgressDialog.show();
         }
 

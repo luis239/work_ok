@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity
         }
         else if (id == R.id.notifications) {
 
-            Intent intent = new Intent(MainActivity.this,GantterActivity.class);
+            Intent intent = new Intent(MainActivity.this,NotificationsActivity.class);
             startActivity(intent);
 
         }else if (id == R.id.nav_logout) {

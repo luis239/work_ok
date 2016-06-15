@@ -38,8 +38,10 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -251,6 +253,12 @@ public class NewProjectActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
+            try {
+                nameProject =  URLEncoder.encode(nameProject, "UTF-8");
+                description = URLEncoder.encode(description, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             String dataUrlParameters = "title="+nameProject+"&description="+description+"&date_start="+dateStart+"&date_end="+dateEnd
                     +"&user_id="+userId+"&action="+ Constants.ACTION_CREATE;
             URL url;
@@ -333,7 +341,7 @@ public class NewProjectActivity extends AppCompatActivity {
 
     public class UpdateProjectTask extends AsyncTask<Void, Void, Boolean> {
 
-        String nameTask;
+        String nameProject;
         String description;
         String dateStart;
         String dateEnd;
@@ -341,7 +349,7 @@ public class NewProjectActivity extends AppCompatActivity {
         ProgressDialog progressDialog;
 
         public UpdateProjectTask(String name, String description, String dateStart, String dateEnd,int project_id,Activity a) {
-            this.nameTask = name;
+            this.nameProject = name;
             this.description = description;
             this.dateStart = dateStart;
             this.dateEnd = dateEnd;
@@ -359,7 +367,13 @@ public class NewProjectActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
-            String dataUrlParameters = "title="+nameTask+"&description="+description+"&date_start="+dateStart+"&date_end="+dateEnd
+            try {
+                nameProject =  URLEncoder.encode(nameProject, "UTF-8");
+                description = URLEncoder.encode(description, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            String dataUrlParameters = "title="+nameProject+"&description="+description+"&date_start="+dateStart+"&date_end="+dateEnd
                     +"&status_id="+status_id+"&project_id="+project_id+"&user_id="+userId+"&task_id="+task_id+"&percentage="+percentage+"&action="+ Constants.ACTION_UPDATE;
             URL url;
             HttpURLConnection connection = null;

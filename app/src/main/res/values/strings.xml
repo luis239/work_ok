@@ -65,6 +65,9 @@
     <string name="message_new_task">Presione el símbolo + para crear nuevas tareas</string>
     <string name="message_no_users">Ingrese Usuarios a sus proyecto</string>
     <string name="error_sign_up">Error al registrar el usuario</string>
+    <string name="no_messages">Usted no tiene nuevas notificaciones</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="my_tasks">Mis Tareas</string>
 
 
 </resources>

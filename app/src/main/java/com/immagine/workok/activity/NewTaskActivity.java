@@ -41,8 +41,10 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -424,6 +426,12 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
         @Override
         protected Boolean doInBackground(Void... params) {
             String dataUrl = "http://www.jexsantofagasta.cl/workok/wotask.php";
+            try {
+                nameTask =  URLEncoder.encode(nameTask, "UTF-8");
+                description = URLEncoder.encode(description, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             String dataUrlParameters = "title="+nameTask+"&description="+description+"&date_start="+dateStart+"&date_end="+dateEnd
                     +"&status_id="+status_id+"&project_id="+projectId+"&user_id="+userId+"&action="+ Constants.ACTION_CREATE;
             URL url;
@@ -537,6 +545,13 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
         @Override
         protected Boolean doInBackground(Void... params) {
             String dataUrl = "http://www.jexsantofagasta.cl/workok/wotask.php";
+
+            try {
+                nameTask =  URLEncoder.encode(nameTask, "UTF-8");
+                description = URLEncoder.encode(description, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             String dataUrlParameters = "title="+nameTask+"&description="+description+"&date_start="+dateStart+"&date_end="+dateEnd
                     +"&status_id="+status_id+"&project_id="+projectId+"&user_id="+userId+"&task_id="+task_id+"&percentage="+percentage+"&action="+ Constants.ACTION_UPDATE;
             URL url;

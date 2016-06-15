@@ -49,6 +49,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -265,11 +267,11 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
 
     private boolean isEmailValid(String email) {
 
-        if(email.contains("ñ"))
+        if (email == null) {
             return false;
-        if (email.contains("@") && email.contains("."))
-            return true;
-        return false;
+        } else {
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+        }
     }
 
     private boolean isPasswordValid(String password) {

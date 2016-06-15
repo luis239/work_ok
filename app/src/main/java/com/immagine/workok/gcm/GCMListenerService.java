@@ -33,18 +33,7 @@ public class GCMListenerService extends GcmListenerService {
     public void onMessageReceived(String from, Bundle data) {
         super.onMessageReceived(from,data);
         String message = data.getString("message");
-        Log.d(TAG, "From: " + from);
-        Log.d(TAG, "Message: " + message);
 
-        /**
-         * El  mensaje recibido se proceso en este metodo.
-         * Ejemplo: - Sincronizar con servidor.
-         *     - Almacenar mensajes en base de datos local.
-         *     - Actualizar UI.
-         *     - Mostrar nofificaciones
-         */
-
-        //En este caso mostraremos una notificacion
         this.MostrarNotification(message);
     }
 

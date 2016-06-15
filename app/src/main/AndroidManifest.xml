@@ -12,42 +12,45 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="com.immagine.workok.permission.C2D_MESSAGE" />
-    <permission android:name="com.immagine.workok.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
+
+    <permission
+        android:name="com.immagine.workok.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
     <meta-data
         android:name="com.google.android.geo.API_KEY"
-        android:value="AIzaSyD8Uu0-WgLA68YKbsf7Hoid.gmZ1ubx1f-KVutUs"/>
-
+        android:value="AIzaSyD8Uu0-WgLA68YKbsf7Hoid.gmZ1ubx1f-KVutUs" />
 
     <application
+        android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name="android.support.multidex.MultiDexApplication">
-
-
+        android:theme="@style/AppTheme">
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="com.example.gcm" />
             </intent-filter>
         </receiver>
+
         <service
-            android:name="com.immagine.workok.gcm.GCMListenerService"
-            android:exported="false" >
+            android:name=".gcm.GCMListenerService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
         <service
-            android:name="com.immagine.workok.listener.InstanceIdListener"
+            android:name=".listener.InstanceIdListener"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID"/>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
 
@@ -95,13 +98,18 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.GantterActivity"
-            android:label="Gantter"
             android:configChanges="orientation"
-            android:screenOrientation="landscape"/>
-        <!--
-
-        -->
-        <activity android:name=".activity.MyTasksActivity"></activity>
+            android:label="Gantter"
+            android:screenOrientation="landscape" />
+        <!--   -->
+        <activity android:name=".activity.MyTasksActivity"
+            android:configChanges="orientation"
+            android:label="@string/my_tasks"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.NotificationsActivity"
+            android:configChanges="orientation"
+            android:label="@string/notifications"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
