@@ -77,6 +77,8 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
     private LinearLayout container;
     ArrayAdapter<User> adapter;
     private boolean isOwner = true;
+    private Button add;
+    private LinearLayout spinnerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,11 +88,13 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
         getSupportActionBar().setHomeButtonEnabled(true);
 
         boolean comeFrom = false;
+        spinnerLayout = (LinearLayout) findViewById( (R.id.layoutSpiner)) ;
         container = (LinearLayout) findViewById(R.id.container_dates) ;
         nameTask = (EditText)findViewById(R.id.projectName);
         description = (EditText)findViewById(R.id.observaciones);
         percent = (EditText)findViewById(R.id.percent);
-        //percent.setText("0");
+        percent.setText("0");
+        add = (Button) findViewById(R.id.add);
 
 
         inProgress = (RadioButton)findViewById(R.id.radioButton);
@@ -213,6 +217,17 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
 
             }
         });
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putInt("ID_PROJECT",projectId);
+                Intent intent =  new Intent(NewTaskActivity.this,AddUserProject.class);
+                intent.putExtras(bundle);
+                startActivity(intent);
+
+            }
+        });
         percent.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -296,14 +311,14 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
             cancel = true;
         }
 
-        if(initDate.equals(finishDate)){
+        /*if(initDate.equals(finishDate)){
 
             startDate.setError("");
             focusView = startDate;
             Snackbar.make(container, "Las Fechas no pueden ser iguales", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             cancel = true;
-        }
+        }*/
         if (percent.getText().toString().length() == 0) {
             percent.setError("Introduzca el Porcentaje");
             percent.requestFocus();
@@ -773,7 +788,7 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
 
 
             }else{
-                spinner.setVisibility(View.GONE);
+                spinnerLayout.setVisibility(View.GONE);
             }
             progressDialog.dismiss();
         }

@@ -19,74 +19,81 @@
         android:src="@drawable/logo"
         android:layout_gravity="center" />
 
-    <LinearLayout
-        android:orientation="vertical"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="1">
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView2" >
 
-        <EditText
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/projectName"
-            android:layout_marginTop="5dp"
-            android:inputType="text"
-            android:hint="@string/projectName" />
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:ems="10"
-            android:id="@+id/description"
-            android:lines="3"
-            android:hint="@string/description" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/projectName"
+                android:layout_marginTop="5dp"
+                android:inputType="text"
+                android:hint="@string/projectName" />
 
-    </LinearLayout>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:ems="10"
+                android:id="@+id/description"
+                android:lines="3"
+                android:hint="@string/description" />
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginTop="10dp">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginTop="10dp">
 
-        <EditText
-            android:layout_width="175dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:id="@+id/startDate"
-            android:hint="@string/date_start"
-            android:textSize="15sp"
-            android:textAlignment="center"
-            android:layout_marginTop="10dp"
-            android:editable="false"
-            android:clickable="true"
-            android:contextClickable="false"
-            android:focusableInTouchMode="false" />
+                <EditText
+                    android:layout_width="165dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:id="@+id/startDate"
+                    android:hint="@string/date_start"
+                    android:textSize="15sp"
+                    android:textAlignment="center"
+                    android:layout_marginTop="10dp"
+                    android:editable="false"
+                    android:clickable="true"
+                    android:contextClickable="false"
+                    android:focusableInTouchMode="false" />
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="date"
-            android:ems="10"
-            android:id="@+id/endDate"
-            android:hint="@string/date_end"
-            android:textSize="15sp"
-            android:textAlignment="center"
-            android:layout_marginTop="10dp"
-            android:onClick="showDatePickerDialog"
-            android:focusableInTouchMode="false"/>
-    </LinearLayout>
+                <EditText
+                    android:layout_width="165dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="date"
+                    android:ems="10"
+                    android:id="@+id/endDate"
+                    android:hint="@string/date_end"
+                    android:textSize="15sp"
+                    android:textAlignment="center"
+                    android:layout_marginTop="10dp"
+                    android:onClick="showDatePickerDialog"
+                    android:focusableInTouchMode="false"
+                    android:layout_weight="1" />
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/create_project"
-        android:id="@+id/create_project"
-        android:layout_gravity="center_horizontal"
-        android:background="#000000"
-        android:textColor="#ffffff"
-        android:layout_marginTop="50dp" />
+            </LinearLayout>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/create_project"
+                android:id="@+id/create_project"
+                android:background="#000000"
+                android:textColor="#ffffff"
+                android:layout_marginTop="50dp"
+                android:layout_weight="200" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

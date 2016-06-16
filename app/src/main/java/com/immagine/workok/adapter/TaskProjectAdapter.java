@@ -31,6 +31,7 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
     }
 
     public class TaskViewHolder extends RecyclerView.ViewHolder implements  View.OnClickListener {
+        private final TextView projectName;
         // Campos respectivos de un item
         public ImageView imageButton;
         public TextView name;
@@ -38,6 +39,7 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
         public TextView percent;
         public ImageView delete;
         public RelativeLayout layout;
+
 
         public TaskViewHolder(View v) {
             super(v);
@@ -47,6 +49,7 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
             userAssigned = (TextView) v.findViewById(R.id.user_assigend);
             percent = (TextView) v.findViewById(R.id.percent);
             imageButton.setImageResource(android.R.drawable.ic_menu_edit);
+            projectName = (TextView) v.findViewById(R.id.projectName);
             layout = (RelativeLayout) v.findViewById(R.id.card_view);
             layout.setOnClickListener(this);
             delete.setOnClickListener(this);
@@ -84,6 +87,7 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
 
         holder.name.setText(items.get(position).getTitle());
         holder.percent.setText("Completado: "+items.get(position).getPercentage()+"%");
+        holder.projectName.setText("Proyecto: "+items.get(position).getProjectName());
         if(items.get(position).getFullname() != null)
             holder.userAssigned.setText("Asignado a: " + items.get(position).getFullname());
 

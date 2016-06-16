@@ -35,6 +35,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
         public ImageView imagen;
         public TextView nombre;
         public TextView visitas;
+        public TextView projectName;
 
         public RelativeLayout layout;
         public ProjectViewHolder(View v) {
@@ -45,6 +46,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
             nombre = (TextView) v.findViewById(R.id.nombre);
             visitas = (TextView) v.findViewById(R.id.user_assigend);
             layout = (RelativeLayout) v.findViewById(R.id.card_view);
+            projectName = (TextView) v.findViewById(R.id.projectName);
             layout.setOnClickListener(this);
             imagen.setOnClickListener(this);
             delete.setOnClickListener(this);
@@ -80,6 +82,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
 
         holder.nombre.setText(items.get(position).getTitle());
         holder.percent.setVisibility(View.GONE);
+        holder.projectName.setVisibility(View.GONE);
         if (isDetail){
             holder.visitas.setText("Completado: "+String.valueOf(items.get(position).getPercentage())+"%");
         }else {

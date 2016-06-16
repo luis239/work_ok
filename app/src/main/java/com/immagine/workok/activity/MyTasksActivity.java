@@ -172,7 +172,7 @@ public class MyTasksActivity extends AppCompatActivity implements TaskProjectAda
                         JSONObject data = dataArray.getJSONObject(i);
                         Task task = new Task(data.getString("title"),
                                 data.getString("description"),data.getString("date_start"),data.getString("date_end"),data.getInt("percentage"),
-                                data.getInt("status_id"),data.getInt("project_id"),data.getInt("user_id"),data.getInt("task_id"),data.getString("fullname"),data.getInt("owner"));
+                                data.getInt("status_id"),data.getInt("project_id"),data.getInt("user_id"),data.getInt("task_id"),data.getString("fullname"),data.getInt("owner"),data.getString("project_title"));
                         items.add(task);
                     }
                     Log.d("Server response",responseStr);

@@ -13,6 +13,11 @@ public class Notifications {
         this.title = title;
     }
 
+    public Notifications(String message) {
+
+        this.message = message;
+    }
+
     public String getMessage() {
         return message;
     }

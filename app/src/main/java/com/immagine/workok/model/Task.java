@@ -7,17 +7,18 @@ import java.io.Serializable;
  */
 public class Task implements Serializable {
 
-    String title;
-    String description;
-    String date_start;
-    String date_end;
-    int percentage;
-    int status_id;
-    int project_id;
-    int user_id;
-    String fullname;
-    int task_id;
-    int ownerId;
+    private String title;
+    private String description;
+    private String date_start;
+    private String date_end;
+    private int percentage;
+    private int status_id;
+    private int project_id;
+    private int user_id;
+    private String fullname;
+    private int task_id;
+    private int ownerId;
+    private String projectName;
 
     public Task() {
         this.title = "";
@@ -33,7 +34,7 @@ public class Task implements Serializable {
 
     }
 
-    public Task(String title, String description, String date_start, String date_end, int percentage, int status_id, int project_id, int user_id, int task_id,String fullname,int ownerId) {
+    public Task(String title, String description, String date_start, String date_end, int percentage, int status_id, int project_id, int user_id, int task_id,String fullname,int ownerId,String projectTitle) {
         this.title = title;
         this.description = description;
         this.date_start = date_start;
@@ -45,9 +46,10 @@ public class Task implements Serializable {
         this.task_id = task_id;
         this.fullname = fullname;
         this.ownerId = ownerId;
+        this.projectName = projectTitle;
     }
 
-    public Task(String title, String description, String date_start, String date_end, int percentage, int status_id, int project_id, int user_id, int task_id,String fullname) {
+    public Task(String title, String description, String date_start, String date_end, int percentage, int status_id, int project_id, int user_id, int task_id,String fullname,String projectTitle) {
         this.title = title;
         this.description = description;
         this.date_start = date_start;
@@ -58,6 +60,7 @@ public class Task implements Serializable {
         this.user_id = user_id;
         this.task_id = task_id;
         this.fullname = fullname;
+        this.projectName = projectTitle;
     }
 
     public String getTitle() {
@@ -146,5 +149,13 @@ public class Task implements Serializable {
 
     public void setOwnerId(int ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 }

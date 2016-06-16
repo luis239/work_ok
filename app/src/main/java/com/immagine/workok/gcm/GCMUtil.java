@@ -90,6 +90,9 @@ public class GCMUtil {
 
     public static Boolean UpdateRegisterServer(Context context, String registrationToken, int tokenUserId) throws  Exception {
         int idUser = tokenUserId;
+
+        if(tokenUserId != User.user.getUser_id())
+            idUser = User.user.getUser_id();
         String dataUrl = "http://www.jexsantofagasta.cl/workok/wouser.php";
         String dataUrlParameters = "user_id=" + idUser + "&token=" + registrationToken + "&action=10";
 
@@ -98,6 +101,7 @@ public class GCMUtil {
 
         try {
             connection = (HttpURLConnection) url.openConnection();
+
             connection.setReadTimeout(10000 /* milliseconds */);
             connection.setConnectTimeout(15000 /* milliseconds */);
             connection.setRequestMethod("POST");
