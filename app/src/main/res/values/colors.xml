@@ -8,4 +8,6 @@
     <color name="negro_semitransparente">#B2000000</color>
     <color name="accent_color">#FF282828</color>
     <color name="blue_grey_800">#ff37474f</color>
+    <color name="light_blue">#56daff</color>
+    <color name="line_color">#009eca</color>
 </resources>

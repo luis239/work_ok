@@ -39,7 +39,7 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
         public TextView percent;
         public ImageView delete;
         public RelativeLayout layout;
-
+        private View line;
 
         public TaskViewHolder(View v) {
             super(v);
@@ -51,6 +51,9 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
             imageButton.setImageResource(android.R.drawable.ic_menu_edit);
             projectName = (TextView) v.findViewById(R.id.projectName);
             layout = (RelativeLayout) v.findViewById(R.id.card_view);
+            layout.setBackgroundResource(R.color.light_blue);
+            line = v.findViewById(R.id.linea);
+            line.setBackgroundResource(R.color.line_color);
             layout.setOnClickListener(this);
             delete.setOnClickListener(this);
 
