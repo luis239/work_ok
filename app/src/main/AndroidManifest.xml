@@ -92,7 +92,7 @@
             android:label="@string/title_add_user"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.ProyectDetailsActivity"
+            android:name=".activity.ProjectDetailsActivity"
             android:configChanges="orientation"
             android:label="@string/title_project_details"
             android:screenOrientation="portrait" />
@@ -109,6 +109,10 @@
         <activity android:name=".activity.NotificationsActivity"
             android:configChanges="orientation"
             android:label="@string/notifications"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.HistoryActivity"
+            android:configChanges="orientation"
+            android:label="@string/historial"
             android:screenOrientation="portrait"/>
     </application>
 

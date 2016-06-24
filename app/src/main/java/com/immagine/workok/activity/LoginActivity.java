@@ -314,7 +314,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, Void, Integer> {
 
         private final String mUser;
         private final String mPassword;
@@ -335,7 +335,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             progressDialog.show();
         }
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected Integer doInBackground(Void... params) {
 
             String dataUrl = "http://www.jexsantofagasta.cl/workok/wouser.php";
             String dataUrlParameters = "username="+mUser+"&password="+mPassword+"&action=6";
@@ -381,19 +381,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     user.setFullname(data.getString("fullname"));
                     user.setUser_id(data.getInt("user_id"));
                     Log.d("Server response",responseStr);
-                    return true;
+                    return 1;
                 }else{
 
 
-                    return false;
+                    return 2;
                 }
 
 
             } catch (Exception e) {
 
                 e.printStackTrace();
-                Toast.makeText(LoginActivity.this,"Error con la Conexión",Toast.LENGTH_LONG);
-                return false;
+                return 3;
 
             } finally {
 
@@ -405,11 +404,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(final Integer success) {
             mAuthTask = null;
 
             //showProgress(false);
-            if (success) {
+            if (success == 1) {
 
                 User.user.setUser_id(user.getUser_id());
                 User.user.setFullname(user.getFullname());
@@ -421,11 +420,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 startActivity(intent);*/
 
 
-            }else{
+            }else if(success == 2){
 
                 Snackbar.make(mLoginFormView, R.string.error_incorrect_password, Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
+            }else{
+                Snackbar.make(mLoginFormView, R.string.error_connection, Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
             progressDialog.dismiss();
         }

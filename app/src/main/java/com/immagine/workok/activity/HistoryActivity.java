@@ -4,33 +4,22 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.immagine.workok.Constants;
-import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
-import com.immagine.workok.adapter.ProjectAdapter;
-import com.immagine.workok.adapter.TaskProjectAdapter;
-import com.immagine.workok.model.Project;
-import com.immagine.workok.model.Task;
+import com.immagine.workok.adapter.NotificationsAdapter;
+import com.immagine.workok.model.Notifications;
 import com.immagine.workok.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -41,113 +30,63 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyTasksActivity extends AppCompatActivity implements TaskProjectAdapter.OnItemClickListener,SearchView.OnQueryTextListener {
+import static com.immagine.workok.R.id.reciclador;
+
+public class HistoryActivity extends AppCompatActivity {
 
     private RecyclerView recycler;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager lManager;
     private TextView message;
-    private TaskAssignedListTask mTask = null;
-    private List<Task> items = new ArrayList<>();
+    private HistoryListTask mTask = null;
+    private List<Notifications> items = new ArrayList<>();
+    private int projectID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_history);
+        Intent intent = getIntent();
+        projectID = intent.getIntExtra("projectID",0);
+        message = (TextView) findViewById(R.id.message);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-        setContentView(R.layout.activity_my_tasks);
-        message = (TextView) findViewById(R.id.message);
-        recycler = (RecyclerView) findViewById(R.id.reciclador);
+        recycler = (RecyclerView) findViewById(reciclador);
         lManager = new LinearLayoutManager(this);
         recycler.setLayoutManager(lManager);
-    }
 
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        PreferencesUtil preference = new PreferencesUtil(this);
-        User.user.setUser_id(preference.getUserId());
-        User.user.setFullname(preference.getUserName());
-        getTasks(User.user.getUser_id());
-
+        getNotifications();
     }
 
-    private void getTasks(final int user_id) {
-        mTask = new TaskAssignedListTask(user_id,MyTasksActivity.this);
+    private void getNotifications() {
+
+        mTask = new HistoryListTask(this);
         mTask.execute((Void) null);
-
-
     }
+
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_search, menu);
-        MenuItem searchItem = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(this);
-        return true;
-    }
-
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        int id = item.getItemId();
-        if(item.getItemId() == android.R.id.home){
-            onBackPressed();
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+            default:
+                break;
         }
-        else
-            return false;
 
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String query) {
-        query = query.toLowerCase();
-
-        final List<Task> filteredList = new ArrayList<>();
-
-        for (int i = 0; i < items.size(); i++) {
-
-            final String text = items.get(i).getTitle().toLowerCase();
-            if (text.contains(query)) {
-
-                filteredList.add(items.get(i));
-            }
-        }
-        adapter = new TaskProjectAdapter(filteredList);
-        recycler.setAdapter(adapter);
-        adapter.notifyDataSetChanged();  // data set changed
         return true;
     }
 
-    @Override
-    public void onClick(View view, int index) {
-
-        Task task = items.get(index);
-        Intent intent = new Intent(this,NewTaskActivity.class);
-        intent.putExtra("task",task);
-        Bundle bundle = new Bundle();
-        bundle.putInt("edit",1);
-        intent.putExtras(bundle);
-        startActivity(intent);
-    }
-
-
-    public class TaskAssignedListTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final int userId;
+    public class HistoryListTask extends AsyncTask<Void, Void, Boolean> {
 
         ProgressDialog progressDialog;
 
-        TaskAssignedListTask(int userId,Activity a) {
-            this.userId = userId;
+        HistoryListTask(Activity a) {
             progressDialog = new ProgressDialog(a,R.style.AppTheme_Dark_Dialog);
 
 
@@ -166,8 +105,8 @@ public class MyTasksActivity extends AppCompatActivity implements TaskProjectAda
 
 
 
-            String dataUrl = "http://www.jexsantofagasta.cl/workok/wotask.php";
-            String dataUrlParameters = "user_id="+userId+"&action="+ Constants.ACTION_LIST_MY_TASKS;
+            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
+            String dataUrlParameters = "project_id="+projectID+"&action=11";
             URL url;
             HttpURLConnection connection = null;
             try {
@@ -207,11 +146,10 @@ public class MyTasksActivity extends AppCompatActivity implements TaskProjectAda
                     for (int i = 0;i<dataArray.length();i++) {
 
                         JSONObject data = dataArray.getJSONObject(i);
-                        Task task = new Task(data.getString("title"),
-                                data.getString("description"),data.getString("date_start"),data.getString("date_end"),data.getInt("percentage"),
-                                data.getInt("status_id"),data.getInt("project_id"),data.getInt("user_id"),data.getInt("task_id"),data.getString("fullname"),
-                                data.getInt("owner"),data.getString("project_title"),data.getString("owner_fullname"));
-                        items.add(task);
+                        String msg = data.getString("message_log");
+                        msg = msg.substring(0,msg.length()-9);
+                        Notifications notifications = new Notifications(data.getString("title"),msg);
+                        items.add(notifications);
                     }
                     Log.d("Server response",responseStr);
                     return true;
@@ -239,27 +177,21 @@ public class MyTasksActivity extends AppCompatActivity implements TaskProjectAda
         @Override
         protected void onPostExecute(final Boolean success) {
             mTask = null;
-
+            progressDialog.dismiss();
             //showProgress(false);
             if (success) {
 
                 if (!items.isEmpty())
                     message.setVisibility(View.GONE);
-
-                adapter = new TaskProjectAdapter(items,MyTasksActivity.this);
+                adapter = new NotificationsAdapter(items);
                 recycler.setAdapter(adapter);
+
+
 
             }else{
 
-
             }
-            progressDialog.dismiss();
-        }
 
-        @Override
-        protected void onCancelled() {
-            mTask = null;
-            //showProgress(false);
         }
     }
 }

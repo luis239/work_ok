@@ -7,6 +7,7 @@
     <string name="action_sign_in">Ingresar</string>
     <string name="action_sign_in_short">Ingresar</string>
     <string name="error_invalid_email">Email no Válido</string>
+    <string name="error_connection">Error en Conexión</string>
     <string name="error_invalid_password">Contraseña muy Corta</string>
     <string name="error_incorrect_password">Contraseña o nombre de usuario inválido</string>
     <string name="error_field_required">Campo Requerido</string>
@@ -60,6 +61,7 @@
     <string name="title_activity_new_project">Nuevo Proyecto</string>
     <string name="exit">Salir</string>
     <string name="export">Exportar</string>
+    <string name="historial">Historial</string>
     <string name="graph_gantt">Graficar Gantter</string>
     <string name="message_no_task">No tiene ninguna Tarea asociada</string>
     <string name="no_user_assigned">No posee usuarios Asignados, Click aqui para asignar</string>
@@ -70,6 +72,9 @@
     <string name="notifications">Notificaciones</string>
     <string name="my_tasks">Mis Tareas</string>
     <string name="search">Buscar</string>
+    <string name="hint_search">Búscar Tarea</string>
+    <string name="delete">Eliminar</string>
+    <string name="delete_project">Eliminar Proyecto</string>
 
 
 </resources>

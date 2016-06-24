@@ -6,32 +6,25 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.SystemClock;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.immagine.workok.Constants;
 import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
 import com.immagine.workok.model.Project;
-import com.immagine.workok.model.Task;
 import com.immagine.workok.model.User;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -73,7 +66,7 @@ public class NewProjectActivity extends AppCompatActivity {
         container = (LinearLayout) findViewById(R.id.container);
         startDate = (EditText) findViewById(R.id.startDate);
         endDate = (EditText) findViewById(R.id.endDate);
-        name = (EditText) findViewById(R.id.projectName);
+        name = (EditText) findViewById(R.id.assigned_by);
         description = (EditText) findViewById( R.id.description);
         startDate.setOnClickListener(new View.OnClickListener() {
             @Override

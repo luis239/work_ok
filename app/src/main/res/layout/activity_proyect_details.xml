@@ -33,6 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:weightSum="1">
+
         <android.support.v7.widget.RecyclerView
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/reciclador"
@@ -73,13 +74,21 @@
                 fab:fab_title="Agregar Usuario" />
 
             <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/edit_proyect_fab"
+                android:id="@+id/edit_project_fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 fab:fab_colorNormal="?attr/colorAccent"
                 fab:fab_icon="@drawable/ic_edit_36"
                 fab:fab_size="mini"
                 fab:fab_title="Editar Proyecto" />
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/delete_project_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                fab:fab_colorNormal="?attr/colorAccent"
+                fab:fab_icon="@android:drawable/ic_menu_delete"
+                fab:fab_size="mini"
+                fab:fab_title="@string/delete_project" />
 
         </com.getbase.floatingactionbutton.FloatingActionsMenu>
 

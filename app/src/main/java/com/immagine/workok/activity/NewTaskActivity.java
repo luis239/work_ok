@@ -90,7 +90,7 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
         boolean comeFrom = false;
         spinnerLayout = (LinearLayout) findViewById( (R.id.layoutSpiner)) ;
         container = (LinearLayout) findViewById(R.id.container_dates) ;
-        nameTask = (EditText)findViewById(R.id.projectName);
+        nameTask = (EditText)findViewById(R.id.assigned_by);
         description = (EditText)findViewById(R.id.observaciones);
         percent = (EditText)findViewById(R.id.percent);
         percent.setText("0");

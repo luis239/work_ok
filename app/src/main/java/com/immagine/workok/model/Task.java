@@ -16,6 +16,7 @@ public class Task implements Serializable {
     private int project_id;
     private int user_id;
     private String fullname;
+    private String assignedBy;
     private int task_id;
     private int ownerId;
     private String projectName;
@@ -34,7 +35,7 @@ public class Task implements Serializable {
 
     }
 
-    public Task(String title, String description, String date_start, String date_end, int percentage, int status_id, int project_id, int user_id, int task_id,String fullname,int ownerId,String projectTitle) {
+    public Task(String title, String description, String date_start, String date_end, int percentage, int status_id, int project_id, int user_id, int task_id,String fullname,int ownerId,String projectTitle,String assignedBy) {
         this.title = title;
         this.description = description;
         this.date_start = date_start;
@@ -47,9 +48,10 @@ public class Task implements Serializable {
         this.fullname = fullname;
         this.ownerId = ownerId;
         this.projectName = projectTitle;
+        this.assignedBy = assignedBy;
     }
 
-    public Task(String title, String description, String date_start, String date_end, int percentage, int status_id, int project_id, int user_id, int task_id,String fullname,String projectTitle) {
+    public Task(String title, String description, String date_start, String date_end, int percentage, int status_id, int project_id, int user_id, int task_id,String fullname,String projectTitle,String assignedBy) {
         this.title = title;
         this.description = description;
         this.date_start = date_start;
@@ -61,6 +63,7 @@ public class Task implements Serializable {
         this.task_id = task_id;
         this.fullname = fullname;
         this.projectName = projectTitle;
+        this.assignedBy = assignedBy;
     }
 
     public String getTitle() {
@@ -157,5 +160,13 @@ public class Task implements Serializable {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    public String getAssignedBy() {
+        return assignedBy;
+    }
+
+    public void setAssignedBy(String assignedBy) {
+        this.assignedBy = assignedBy;
     }
 }

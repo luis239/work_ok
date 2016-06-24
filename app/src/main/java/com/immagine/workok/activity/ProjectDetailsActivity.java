@@ -6,11 +6,15 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -21,9 +25,7 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.immagine.workok.Constants;
 import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
-import com.immagine.workok.adapter.ProjectAdapter;
 import com.immagine.workok.adapter.TaskProjectAdapter;
-import com.immagine.workok.adapter.UserProjectAdapter;
 import com.immagine.workok.model.Project;
 import com.immagine.workok.model.Task;
 import com.immagine.workok.model.User;
@@ -40,7 +42,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProyectDetailsActivity extends AppCompatActivity implements TaskProjectAdapter.OnItemClickListener {
+public class ProjectDetailsActivity extends AppCompatActivity implements TaskProjectAdapter.OnItemClickListener,SearchView.OnQueryTextListener {
 
 
     private Activity act;
@@ -50,9 +52,11 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
     private List<Task> items = new ArrayList<>();
     private FloatingActionButton addTask;
     private FloatingActionButton addUser;
-    private FloatingActionButton editProyect;
+    private FloatingActionButton editProject;
+    private FloatingActionButton deleteProject;
     private TaskListTask mTask = null;
     private DeleteTask dTask = null;
+    private DeleteProjectTask dpTask = null;
     private Project project;
     private TextView message;
     @Override
@@ -78,14 +82,15 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
 
         addTask = (FloatingActionButton) findViewById(R.id.add_task_fab);
         addUser = (FloatingActionButton) findViewById(R.id.add_user_fab);
-        editProyect = (FloatingActionButton) findViewById(R.id.edit_proyect_fab);
+        editProject = (FloatingActionButton) findViewById(R.id.edit_project_fab);
+        deleteProject = (FloatingActionButton) findViewById(R.id.delete_project_fab);
         addTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putInt("ID",project.getProject_id());
                 bundle.putInt("edit",0);
-                Intent intent =  new Intent(ProyectDetailsActivity.this,NewTaskActivity.class);
+                Intent intent =  new Intent(ProjectDetailsActivity.this,NewTaskActivity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
@@ -95,20 +100,26 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putInt("ID_PROJECT",project.getProject_id());
-                Intent intent =  new Intent(ProyectDetailsActivity.this,AddUserProject.class);
+                Intent intent =  new Intent(ProjectDetailsActivity.this,AddUserProject.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
-        editProyect.setOnClickListener(new View.OnClickListener() {
+        editProject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent =  new Intent(ProyectDetailsActivity.this,NewProjectActivity.class);
+                Intent intent =  new Intent(ProjectDetailsActivity.this,NewProjectActivity.class);
                 intent.putExtra("project",project);
                 Bundle bundle = new Bundle();
                 bundle.putInt("edit",1);
                 intent.putExtras(bundle);
                 startActivity(intent);
+            }
+        });
+        deleteProject.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteProject();
             }
         });
 
@@ -127,6 +138,16 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.project_details_menubar, menu);
+        MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(this);
+        return true;
+    }
+
     private void getTasksListTask(final int project_id) {
 
 
@@ -139,7 +160,15 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
-        if(item.getItemId() == android.R.id.home){
+
+        if(id == R.id.history_option){
+            Intent intent = new Intent(this,HistoryActivity.class);
+            intent.putExtra("projectID",project.getProject_id());
+            startActivity(intent);
+            return true;
+        }
+
+        if(id == android.R.id.home){
             onBackPressed();
             return true;
         }
@@ -164,7 +193,7 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
             builder.setMessage("¿Desea eliminar esta Tarea?");
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    dTask = new DeleteTask(ProyectDetailsActivity.this,items.get(pos).getTask_id(),pos);
+                    dTask = new DeleteTask(ProjectDetailsActivity.this,items.get(pos).getTask_id(),pos);
                     dTask.execute((Void) null);
                 }
             });
@@ -194,6 +223,51 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
 
 
 
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String query) {
+        query = query.toLowerCase();
+
+        final List<Task> filteredList = new ArrayList<>();
+
+        for (int i = 0; i < items.size(); i++) {
+
+            final String text = items.get(i).getTitle().toLowerCase();
+            if (text.contains(query)) {
+
+                filteredList.add(items.get(i));
+            }
+        }
+        adapter = new TaskProjectAdapter(filteredList);
+        recycler.setAdapter(adapter);
+        adapter.notifyDataSetChanged();  // data set changed
+        return true;
+    }
+
+    public void deleteProject(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("¿Desea eliminar este Proyecto?");
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dpTask = new DeleteProjectTask(ProjectDetailsActivity.this,project.getProject_id());
+                dpTask.execute((Void) null);
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+
+        AlertDialog dialog = builder.show();
+        dialog.setCanceledOnTouchOutside(true);
     }
 
     public class TaskListTask extends AsyncTask<Void, Void, Boolean> {
@@ -263,7 +337,7 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
                         JSONObject data = dataArray.getJSONObject(i);
                         Task task = new Task(data.getString("title"),
                                 data.getString("description"),data.getString("date_start"),data.getString("date_end"),data.getInt("percentage"),
-                                data.getInt("status_id"),data.getInt("project_id"),data.getInt("user_id"),data.getInt("task_id"),data.getString("fullname"),data.getString("project_title"));
+                                data.getInt("status_id"),data.getInt("project_id"),data.getInt("user_id"),data.getInt("task_id"),data.getString("fullname"),data.getString("project_title"),data.getString("owner_fullname"));
                         items.add(task);
                     }
                     Log.d("Server response",responseStr);
@@ -295,7 +369,7 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
             if (success) {
                 if(!items.isEmpty())
                     message.setVisibility(View.GONE);
-                adapter = new TaskProjectAdapter(items,ProyectDetailsActivity.this);
+                adapter = new TaskProjectAdapter(items,ProjectDetailsActivity.this);
                 recycler.setAdapter(adapter);
 
             }else{
@@ -406,12 +480,116 @@ public class ProyectDetailsActivity extends AppCompatActivity implements TaskPro
                 adapter.notifyItemRemoved(index);
                 if(items.isEmpty())
                     message.setVisibility(View.VISIBLE);
-                Toast.makeText(ProyectDetailsActivity.this,"Tarea Eliminada satisfactoriamente",Toast.LENGTH_LONG).show();
+                Toast.makeText(ProjectDetailsActivity.this,"Tarea Eliminada satisfactoriamente",Toast.LENGTH_LONG).show();
 
 
             }else{
 
-                Toast.makeText(ProyectDetailsActivity.this,"Error Eliminando la tarea",Toast.LENGTH_LONG).show();
+                Toast.makeText(ProjectDetailsActivity.this,"Error Eliminando la tarea",Toast.LENGTH_LONG).show();
+            }
+            progressDialog.dismiss();
+        }
+
+        @Override
+        protected void onCancelled() {
+            mTask = null;
+            //showProgress(false);
+        }
+    }
+
+    public class DeleteProjectTask extends AsyncTask<Void, Void, Boolean> {
+
+
+        int projectId,index;
+        ProgressDialog progressDialog;
+        DeleteProjectTask(Activity activity,int projectId) {
+
+            this.projectId = projectId;
+            progressDialog = new ProgressDialog(activity,R.style.AppTheme_Dark_Dialog);
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Espere...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
+            String dataUrlParameters = "project_id="+projectId+"&action="+ Constants.ACTION_DELETE_PROJECT;
+            URL url;
+            HttpURLConnection connection = null;
+            try {
+                // Create connection
+                url = new URL(dataUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Length","" + Integer.toString(dataUrlParameters.getBytes().length));
+                connection.setRequestProperty("Content-Language", "en-US");
+                connection.setUseCaches(false);
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                // Send request
+                DataOutputStream wr = new DataOutputStream(
+                        connection.getOutputStream());
+                wr.writeBytes(dataUrlParameters);
+                wr.flush();
+                wr.close();
+                // Get Response
+                InputStream is = connection.getInputStream();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                String line;
+                StringBuffer response = new StringBuffer();
+
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
+
+                String responseStr = response.toString();
+                JSONObject jsonObj = new JSONObject(responseStr);
+                if(jsonObj.getString("success").equals("1")){
+                    Log.d("Server response",responseStr);
+                    return true;
+                }else{
+
+
+                    return false;
+                }
+
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return false;
+
+            } finally {
+
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+
+        }
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mTask = null;
+
+            //showProgress(false);
+            if (success) {
+
+                Toast.makeText(ProjectDetailsActivity.this,"Proyecto Eliminado satisfactoriamente",Toast.LENGTH_LONG).show();
+                finish();
+
+
+            }else{
+
+                Toast.makeText(ProjectDetailsActivity.this,"Error Eliminando el Proyecto",Toast.LENGTH_LONG).show();
             }
             progressDialog.dismiss();
         }

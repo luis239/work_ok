@@ -1,14 +1,17 @@
 package com.immagine.workok.adapter;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.immagine.workok.R;
 import com.immagine.workok.model.Project;
 
@@ -34,19 +37,26 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
         public TextView percent;
         public ImageView imagen;
         public TextView nombre;
-        public TextView visitas;
+        public TextView userAssigned;
         public TextView projectName;
-
+        public RoundCornerProgressBar progressBar;
         public RelativeLayout layout;
+        public Context context;
+        public TextView assignedBy;
         public ProjectViewHolder(View v) {
             super(v);
+            context = v.getContext();
             imagen = (ImageView) v.findViewById(R.id.imageButton);
             delete = (ImageView) v.findViewById(R.id.delete);
             percent = (TextView) v.findViewById(R.id.percent);
             nombre = (TextView) v.findViewById(R.id.nombre);
-            visitas = (TextView) v.findViewById(R.id.user_assigend);
+            userAssigned = (TextView) v.findViewById(R.id.user_assigend);
+            assignedBy = (TextView) v.findViewById(R.id.projectName);
             layout = (RelativeLayout) v.findViewById(R.id.card_view);
-            projectName = (TextView) v.findViewById(R.id.projectName);
+            projectName = (TextView) v.findViewById(R.id.assigned_by);
+
+            progressBar = (RoundCornerProgressBar) v.findViewById(R.id.progressBar);
+            progressBar.setMax(100);
             layout.setOnClickListener(this);
             imagen.setOnClickListener(this);
             delete.setOnClickListener(this);
@@ -79,14 +89,29 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
 
     @Override
     public void onBindViewHolder(ProjectViewHolder holder, int position) {
-
+        int percentage = items.get(position).getPercentage();
         holder.nombre.setText(items.get(position).getTitle());
-        holder.percent.setVisibility(View.GONE);
+        //holder.percent.setVisibility(View.GONE);
         holder.projectName.setVisibility(View.GONE);
+        holder.delete.setVisibility(View.GONE);
+        holder.assignedBy.setVisibility(View.INVISIBLE);
+        holder.userAssigned.setVisibility(View.INVISIBLE);
         if (isDetail){
-            holder.visitas.setText("Completado: "+String.valueOf(items.get(position).getPercentage())+"%");
+            holder.percent.setText("Completado: "+String.valueOf(items.get(position).getPercentage())+"%");
         }else {
-            holder.visitas.setText("Completado: " + String.valueOf(items.get(position).getPercentage()) + "%");
+            holder.percent.setText(String.valueOf(percentage) + "%");
+            holder.progressBar.setProgress(percentage);
+            if(percentage < 50) {
+                holder.progressBar.setProgressColor(ContextCompat.getColor(holder.context, R.color.red));
+            }
+            if((percentage >= 50)&&(percentage < 100)) {
+                holder.progressBar.setProgressColor(ContextCompat.getColor(holder.context, R.color.yellow));
+                holder.percent.setTextColor(Color.BLACK);
+            }
+            if(percentage == 100) {
+                holder.progressBar.setProgressColor(ContextCompat.getColor(holder.context, R.color.green));
+                holder.percent.setTextColor(Color.BLACK);
+            }
         }
     }
 
