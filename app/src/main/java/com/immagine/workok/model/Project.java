@@ -18,6 +18,11 @@ public class Project implements Serializable {
     private boolean selected;
     //private User userAssigned = new User();
 
+    public Project() {
+        this.title = null;
+        this.description = null;
+        this.percentage = 0;
+    }
     public Project(String title, String description, int percentage) {
         this.title = title;
         this.description = description;

@@ -23,6 +23,7 @@ import java.util.List;
 public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.TaskViewHolder> {
 
 
+    private int statusID = 0;
     private List<Task> items;
     private boolean isDetail = false;
 
@@ -80,11 +81,17 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
         this.items = items;
     }
 
-        public TaskProjectAdapter(List<Task> items, OnItemClickListener listener) {
+    public TaskProjectAdapter(List<Task> items, OnItemClickListener listener) {
 
-            this.items = items;
-            this.listener = listener;
-        }
+        this.items = items;
+        this.listener = listener;
+    }
+    public TaskProjectAdapter(List<Task> items, OnItemClickListener listener,int statusID) {
+
+        this.items = items;
+        this.listener = listener;
+        this.statusID = statusID;
+    }
 
     @Override
     public TaskViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
@@ -102,6 +109,13 @@ public class TaskProjectAdapter extends RecyclerView.Adapter<TaskProjectAdapter.
         holder.percent.setText(percentage+"%");
         holder.projectName.setText("Proyecto: "+items.get(position).getProjectName());
         holder.progressBar.setProgress(percentage);
+
+        if(statusID == 7){
+            //holder.layout.setClickable(false);
+            //holder.layout.setFocusableInTouchMode(false);
+            holder.delete.setVisibility(View.INVISIBLE);
+            holder.imageButton.setVisibility(View.INVISIBLE);
+        }
         if(percentage < 50) {
             holder.progressBar.setProgressColor(ContextCompat.getColor(holder.context, R.color.red));
         }

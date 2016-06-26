@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.immagine.workok.Constants;
 import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
@@ -37,8 +38,10 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +62,10 @@ public class ProjectDetailsActivity extends AppCompatActivity implements TaskPro
     private DeleteProjectTask dpTask = null;
     private Project project;
     private TextView message;
+    private FinishProjectTask fTask;
+    private FloatingActionsMenu menuFab;
+    private MenuItem finishProjectMenuItem;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +91,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements TaskPro
         addUser = (FloatingActionButton) findViewById(R.id.add_user_fab);
         editProject = (FloatingActionButton) findViewById(R.id.edit_project_fab);
         deleteProject = (FloatingActionButton) findViewById(R.id.delete_project_fab);
+        menuFab = (FloatingActionsMenu) findViewById(R.id.menu_fab);
         addTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,6 +100,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements TaskPro
                 bundle.putInt("edit",0);
                 Intent intent =  new Intent(ProjectDetailsActivity.this,NewTaskActivity.class);
                 intent.putExtras(bundle);
+                intent.putExtra("project",project);
                 startActivity(intent);
             }
         });
@@ -123,6 +132,13 @@ public class ProjectDetailsActivity extends AppCompatActivity implements TaskPro
             }
         });
 
+        if(project.getStatus_id() == 7){
+            menuFab.setVisibility(View.GONE);
+            //finishProject.setVisible(false);
+            recycler.setFocusableInTouchMode(false);
+            recycler.setClickable(false);
+        }
+
 
     }
 
@@ -145,6 +161,10 @@ public class ProjectDetailsActivity extends AppCompatActivity implements TaskPro
         MenuItem searchItem = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(this);
+        if(project.getStatus_id() == 7) {
+            finishProjectMenuItem = menu.findItem(R.id.end_project);
+            finishProjectMenuItem.setVisible(false);
+        }
         return true;
     }
 
@@ -167,6 +187,10 @@ public class ProjectDetailsActivity extends AppCompatActivity implements TaskPro
             startActivity(intent);
             return true;
         }
+        if(id == R.id.end_project){
+            finishProject();
+            return true;
+        }
 
         if(id == android.R.id.home){
             onBackPressed();
@@ -175,6 +199,39 @@ public class ProjectDetailsActivity extends AppCompatActivity implements TaskPro
         else
             return false;
 
+    }
+
+    private void finishProject() {
+        if (project.getPercentage()< 100){
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("El Proyecto debe estar al 100% para ser finalizado");
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                }
+            });
+
+            AlertDialog dialog = builder.show();
+            dialog.setCanceledOnTouchOutside(true);
+
+        }else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("¿Desea finalizar este Proyecto?");
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    fTask = new FinishProjectTask(ProjectDetailsActivity.this,project.getProject_id());
+                    fTask.execute((Void) null);
+                }
+            });
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User cancelled the dialog
+                }
+            });
+
+            AlertDialog dialog = builder.show();
+            dialog.setCanceledOnTouchOutside(true);
+        }
     }
 
     @Override
@@ -217,6 +274,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements TaskPro
             bundle.putInt("edit",1);
             bundle.putInt("ID",project.getProject_id());
             intent.putExtras(bundle);
+            intent.putExtra("project",project);
             startActivity(intent);
         }
 
@@ -244,7 +302,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements TaskPro
                 filteredList.add(items.get(i));
             }
         }
-        adapter = new TaskProjectAdapter(filteredList);
+        adapter = new TaskProjectAdapter(filteredList,ProjectDetailsActivity.this,project.getStatus_id());
         recycler.setAdapter(adapter);
         adapter.notifyDataSetChanged();  // data set changed
         return true;
@@ -319,7 +377,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements TaskPro
                 InputStream is = connection.getInputStream();
                 BufferedReader rd = new BufferedReader(new InputStreamReader(is));
                 String line;
-                StringBuffer response = new StringBuffer();
+                StringBuilder response = new StringBuilder();
 
                 while ((line = rd.readLine()) != null) {
                     response.append(line);
@@ -369,7 +427,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements TaskPro
             if (success) {
                 if(!items.isEmpty())
                     message.setVisibility(View.GONE);
-                adapter = new TaskProjectAdapter(items,ProjectDetailsActivity.this);
+                adapter = new TaskProjectAdapter(items,ProjectDetailsActivity.this,project.getStatus_id());
                 recycler.setAdapter(adapter);
 
             }else{
@@ -511,7 +569,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements TaskPro
 
         @Override
         protected void onPreExecute() {
-            progressDialog.setMessage("Espere...");
+            progressDialog.setMessage("Eliminando...");
             progressDialog.setCancelable(false);
             progressDialog.show();
         }
@@ -600,4 +658,117 @@ public class ProjectDetailsActivity extends AppCompatActivity implements TaskPro
             //showProgress(false);
         }
     }
+
+    public class FinishProjectTask extends AsyncTask<Void, Void, Boolean> {
+
+        String nameProject;
+        String description;
+        String dateStart;
+        String dateEnd;
+        int userId,project_id,status_id,percentage,task_id;
+        ProgressDialog progressDialog;
+
+        public FinishProjectTask(String name, String description, String dateStart, String dateEnd, int project_id, Activity a) {
+            this.nameProject = name;
+            this.description = description;
+            this.dateStart = dateStart;
+            this.dateEnd = dateEnd;
+            this.project_id = project_id;
+            progressDialog = new ProgressDialog(a,R.style.AppTheme_Dark_Dialog);
+        }
+
+        public FinishProjectTask(Activity a, int projectID) {
+            project_id = projectID;
+            progressDialog = new ProgressDialog(a,R.style.AppTheme_Dark_Dialog);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Cargando...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            String dataUrl = "http://www.jexsantofagasta.cl/workok/woproject.php";
+            String dataUrlParameters ="project_id="+project_id+"&status_id=7&action="+ Constants.ACTION_UPDATE;
+            URL url;
+            HttpURLConnection connection = null;
+            try {
+                // Create connection
+                url = new URL(dataUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Length","" + Integer.toString(dataUrlParameters.getBytes().length));
+                connection.setRequestProperty("Content-Language", "en-US");
+                connection.setUseCaches(false);
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                // Send request
+                DataOutputStream wr = new DataOutputStream(
+                        connection.getOutputStream());
+                wr.writeBytes(dataUrlParameters);
+                wr.flush();
+                wr.close();
+                // Get Response
+                InputStream is = connection.getInputStream();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                String line;
+                StringBuffer response = new StringBuffer();
+
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
+
+                String responseStr = response.toString();
+                JSONObject jsonObj = new JSONObject(responseStr);
+                if(jsonObj.getString("success").equals("1")){
+                    Log.d("Server response", responseStr);
+                    return true;
+                }else{
+                    return false;
+                }
+
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                return false;
+
+            } finally {
+
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+
+            if (success) {
+                if (success) {
+
+                    Toast.makeText(ProjectDetailsActivity.this,"Proyecto Finalizado Exitosamente",Toast.LENGTH_LONG).show();
+                    progressDialog.dismiss();
+                    finish();
+
+
+                }
+            } else {
+                Toast.makeText(ProjectDetailsActivity.this,"Error al Finalizar el proyecto",Toast.LENGTH_LONG).show();
+            }
+            progressDialog.dismiss();
+        }
+
+        @Override
+        protected void onCancelled() {
+            mTask = null;
+        }
+    }
+
 }

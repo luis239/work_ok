@@ -5,12 +5,13 @@
     <color name="colorAccent">#ffffff</color>
     <color name="holo_blue_light">#555555</color>
     <color name="darker_gray">#828282</color>
-    <color name="negro_semitransparente">#B2000000</color>
+    <color name="negro_semitransparente">#d0000000</color>
     <color name="accent_color">#FF282828</color>
     <color name="blue_grey_800">#ff37474f</color>
-    <color name="light_blue">#81d2ee</color>
+    <color name="light_blue">#0073BA</color>
     <color name="line_color">#0d0906</color>
     <color name="red">#e74e53</color>
     <color name="yellow">#f2f252</color>
     <color name="green">#89e465</color>
+    <color name="green_card">#9eea80</color>
 </resources>

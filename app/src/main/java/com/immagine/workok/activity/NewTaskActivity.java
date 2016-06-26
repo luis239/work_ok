@@ -24,6 +24,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 import com.immagine.workok.Constants;
 import com.immagine.workok.PreferencesUtil;
 import com.immagine.workok.R;
+import com.immagine.workok.model.Project;
 import com.immagine.workok.model.Task;
 import com.immagine.workok.model.User;
 
@@ -79,6 +81,9 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
     private boolean isOwner = true;
     private Button add;
     private LinearLayout spinnerLayout;
+    private Project project;
+    private Date projectFinishDate = new Date();
+    private Date projectInitDate = new Date();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +91,8 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
         setContentView(R.layout.activity_new_task);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
+        Intent intent = getIntent();
+        project = (Project) intent.getSerializableExtra("project");
         boolean comeFrom = false;
         spinnerLayout = (LinearLayout) findViewById( (R.id.layoutSpiner)) ;
         container = (LinearLayout) findViewById(R.id.container_dates) ;
@@ -95,7 +101,10 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
         percent = (EditText)findViewById(R.id.percent);
         percent.setText("0");
         add = (Button) findViewById(R.id.add);
-
+        String pDateEnd,pDateStart;
+        pDateEnd = inverseDate(project.getDateEnd());
+        pDateStart = inverseDate(project.getDateStart());
+        dateCasting(pDateStart,pDateEnd);
 
         inProgress = (RadioButton)findViewById(R.id.radioButton);
         inProgress.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -164,7 +173,7 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
         isEdit = bundle.getInt("edit");
         projectId = bundle.getInt("ID");
         if(isEdit == 1) {
-            Intent intent = getIntent();
+
             task = (Task) intent.getSerializableExtra("task");
             comeFrom = intent.getBooleanExtra("come_from_details",false);
             if(task.getOwnerId() != User.user.getUser_id() && !comeFrom)
@@ -186,8 +195,43 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
             String dateEnd = inverseDate(task.getDate_end());
             startDate.setText(dateInit);
             endDate.setText(dateEnd);
+            button.setText(getString(R.string.update_status));
             setTitle("Actualizar Tarea");
             initializeDates();
+            if (task.getStatus_id() == 8){
+
+                startDate.setClickable(false);
+                startDate.setFocusableInTouchMode(false);
+                startDate.setEnabled(false);
+                endDate.setClickable(false);
+                endDate.setFocusableInTouchMode(false);
+                endDate.setEnabled(false);
+                nameTask.setClickable(false);
+                nameTask.setFocusableInTouchMode(false);
+                nameTask.setEnabled(false);
+                percent.setClickable(false);
+                percent.setFocusableInTouchMode(false);
+                percent.setEnabled(false);
+                description.setClickable(false);
+                description.setFocusableInTouchMode(false);
+                description.setEnabled(false);
+                spinner.setClickable(false);
+                spinner.setClickable(false);
+                spinner.setFocusableInTouchMode(false);
+                button.setVisibility(View.GONE);
+                inProgress.setClickable(false);
+                inProgress.setClickable(false);
+                inProgress.setEnabled(false);
+                rejected.setClickable(false);
+                rejected.setClickable(false);
+                rejected.setEnabled(false);
+                done.setClickable(false);
+                done.setClickable(false);
+                done.setEnabled(false);
+                add.setVisibility(View.GONE);
+
+            }
+
         }
         if (!isOwner){
 
@@ -204,6 +248,7 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
             spinner.setFocusableInTouchMode(false);
 
         }
+
 
         label = (TextView)findViewById(R.id.no_assigned);
         label.setOnClickListener(new View.OnClickListener() {
@@ -250,6 +295,17 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
 
         spinner.setOnItemSelectedListener(this);
 
+    }
+
+    private void dateCasting(String dateStart, String dateEnd) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            projectFinishDate = sdf.parse(dateEnd);
+            projectInitDate = sdf.parse(dateStart);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initializeDates() {
@@ -311,6 +367,22 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
             cancel = true;
         }
 
+        if(initDate.after(projectFinishDate)||initDate.before(projectInitDate)){
+
+            startDate.setError("");
+            focusView = startDate;
+            Snackbar.make(container, "La fecha debe estar dentro del rango del proyecto "+inverseDate(project.getDateStart())+" - "+inverseDate(project.getDateEnd()), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            cancel = true;
+        }
+        if(finishDate.after(projectFinishDate)){
+
+            endDate.setError("");
+            focusView = startDate;
+            Snackbar.make(container, "La fecha debe estar dentro del rango del proyecto "+inverseDate(project.getDateStart())+" - "+inverseDate(project.getDateEnd()), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            cancel = true;
+        }
         /*if(initDate.equals(finishDate)){
 
             startDate.setError("");

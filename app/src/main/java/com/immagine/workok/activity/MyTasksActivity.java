@@ -49,6 +49,7 @@ public class MyTasksActivity extends AppCompatActivity implements TaskProjectAda
     private TextView message;
     private TaskAssignedListTask mTask = null;
     private List<Task> items = new ArrayList<>();
+    private List<Project> projects = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,6 +137,7 @@ public class MyTasksActivity extends AppCompatActivity implements TaskProjectAda
         Bundle bundle = new Bundle();
         bundle.putInt("edit",1);
         intent.putExtras(bundle);
+        intent.putExtra("project",projects.get(index));
         startActivity(intent);
     }
 
@@ -211,6 +213,10 @@ public class MyTasksActivity extends AppCompatActivity implements TaskProjectAda
                                 data.getString("description"),data.getString("date_start"),data.getString("date_end"),data.getInt("percentage"),
                                 data.getInt("status_id"),data.getInt("project_id"),data.getInt("user_id"),data.getInt("task_id"),data.getString("fullname"),
                                 data.getInt("owner"),data.getString("project_title"),data.getString("owner_fullname"));
+                        Project project = new Project();
+                        project.setDateStart(data.getString("project_start"));
+                        project.setDateEnd(data.getString("project_end"));
+                        projects.add(project);
                         items.add(task);
                     }
                     Log.d("Server response",responseStr);

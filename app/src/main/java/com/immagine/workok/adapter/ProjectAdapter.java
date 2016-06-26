@@ -23,6 +23,7 @@ import java.util.List;
 public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectViewHolder> {
 
 
+    private int statusID;
     private List<Project> items;
     private boolean isDetail = false;
 
@@ -74,11 +75,11 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
         this.items = items;
     }
 
-        public ProjectAdapter(List<Project> items,OnItemClickListener listener) {
+    public ProjectAdapter(List<Project> items,OnItemClickListener listener) {
 
-            this.items = items;
-            this.listener = listener;
-        }
+        this.items = items;
+        this.listener = listener;
+    }
 
     @Override
     public ProjectViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
@@ -95,7 +96,14 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectV
         holder.projectName.setVisibility(View.GONE);
         holder.delete.setVisibility(View.GONE);
         holder.assignedBy.setVisibility(View.INVISIBLE);
-        holder.userAssigned.setVisibility(View.INVISIBLE);
+
+        if(items.get(position).getStatus_id() == 7){
+
+            holder.userAssigned.setText("Estado: Finalizado");
+            holder.layout.setBackgroundColor(ContextCompat.getColor(holder.context,R.color.green_card));
+        }else{
+            holder.userAssigned.setVisibility(View.INVISIBLE);
+        }
         if (isDetail){
             holder.percent.setText("Completado: "+String.valueOf(items.get(position).getPercentage())+"%");
         }else {
