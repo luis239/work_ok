@@ -438,7 +438,7 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
 
         int percent = Integer.parseInt(this.percent.getText().toString());
         mTaskU = new UpdateTask(nameTask.getText().toString(),description.getText().toString(),startDate.getText().toString(),endDate.getText().toString(),projectId,status_id,
-                percent,userIdSelected,NewTaskActivity.this,task.getTask_id());
+                percent,userIdSelected,NewTaskActivity.this,task.getTask_id(),User.user.getUser_id());
 
         mTaskU.execute((Void) null);
     }
@@ -604,9 +604,10 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
         String dateEnd;
         int userId,project_id,status_id,percentage,task_id;
         ProgressDialog progressDialog;
+        int userModifyId;
 
         public UpdateTask(String nameProject, String description, String dateStart, String dateEnd, int project_id,
-                          int status_id,int percentage , int user_id, Activity a,int task_id) {
+                          int status_id,int percentage , int user_id, Activity a,int task_id,int userModifyId) {
             this.nameTask = nameProject;
             this.description = description;
             this.dateStart = dateStart;
@@ -616,6 +617,7 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
             this.status_id = status_id;
             this.percentage = percentage;
             this.task_id = task_id;
+            this.userModifyId = userModifyId;
             progressDialog = new ProgressDialog(a,R.style.AppTheme_Dark_Dialog);
         }
 
@@ -637,7 +639,8 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
                 e.printStackTrace();
             }
             String dataUrlParameters = "title="+nameTask+"&description="+description+"&date_start="+dateStart+"&date_end="+dateEnd
-                    +"&status_id="+status_id+"&project_id="+projectId+"&user_id="+userId+"&task_id="+task_id+"&percentage="+percentage+"&action="+ Constants.ACTION_UPDATE;
+                    +"&status_id="+status_id+"&project_id="+projectId+"&user_id="+userId+"&task_id="+task_id+
+                    "&percentage="+percentage+"&action="+ Constants.ACTION_UPDATE+"&assigned_id="+userModifyId;
             URL url;
             HttpURLConnection connection = null;
             try {
