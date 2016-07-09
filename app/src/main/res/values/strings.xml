@@ -31,7 +31,7 @@
     <string name="title_activity_main">Mis Proyectos</string>
     <string name="title_new_task">Nueva Tarea</string>
     <string name="title_add_user">Agregar Usuario</string>
-    <string name="title_project_details">Detalle de Proyecto</string>
+    <string name="title_project_details">Tareas de Proyecto</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

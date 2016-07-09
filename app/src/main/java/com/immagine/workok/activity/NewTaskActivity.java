@@ -189,7 +189,7 @@ public class NewTaskActivity extends AppCompatActivity implements AdapterView.On
             }else if(status_id==5){
                 done.setChecked(true);
             }
-            description.setText(task.getDescription());
+            description.setText("");
             percent.setText(String.valueOf(task.getPercentage()));
             String dateInit = inverseDate(task.getDate_start());
             String dateEnd = inverseDate(task.getDate_end());
